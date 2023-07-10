@@ -1,0 +1,1044 @@
+---
+title: "Impatto dell'altezza sulla prestazione dei giocatori di NBA"
+author: 'Federico Mizzaro'
+date: "2023-07-14"
+output:
+  ioslides_presentation:
+    widescreen: true
+  beamer: deafult
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+#PACCHETTI E LIBRERIE
+
+# install.packages("measurements")
+#install.packages("hexbin")
+#install.packages("RColorBrewer")
+#install.packages("ggplot2")
+#install.packages("ggpubr")
+#install.packages("tidyverse") #contiene ggplot2, dplyr, tidyr
+#install.packages("broom")
+#install.packages("AICcmodavg")
+#install.packages("car")
+#install.packages("ggExtra")
+#install.packages("gridExtra")
+#install.packages("viridis")
+#install.packages("hrbrthemes")
+#install.packages("dplyr")
+#install.packages("plotly")
+
+
+library(measurements)
+library(knitr)
+library(hexbin)
+library(RColorBrewer)
+library(ggplot2)
+library(ggpubr)
+library(tidyverse)
+library(broom)
+library(AICcmodavg)
+library(car)
+library(ggExtra)
+library(gridExtra)
+library(viridis)
+library(hrbrthemes)
+library(dplyr)
+library(plotly)
+
+
+# OTTENGO IL DATASET (.txt -> csv) E LO PULISCO
+
+# Leggo i file .txt (header=TRUE perchè i dataset presentano intestazione nella prima riga)
+altezze <- read.table("altezze.txt", header = TRUE, sep = "\t")
+statistiche <- read.table("statistiche.txt", header = TRUE, sep = "\t")
+
+# creo i file corrispondenti .csv
+write.csv(altezze, "altezze.csv", row.names = FALSE)
+write.csv(statistiche, "statistiche.csv", row.names = FALSE)
+
+# ricarico i due dataset, ora in formato csv
+altezze <- read.csv("altezze.csv")
+statistiche <- read.csv("statistiche.csv")
+
+# Unione dei dataset basata sulla colonna in comune (Players) con il comando merge
+dataframe <- merge(altezze, statistiche, by = "Player")
+
+# controllare i nomi delle colonne nel mio dataframe
+# print(colnames(dataframe))
+
+# conversione della colonna HT (height), in stringhe per poterli convertire in cm (come numeri, 5 piedi e 10/11 pollici verrebbe altrimenti letti come i numero 5.10 e 5.11)
+dataframe$HT_string <- as.character(dataframe$HT)
+
+# Converto i valori di altezza in piedi e pollici in centimetri (\\. indica che lo split avviene al punto; 1 piede = 12 pollici = 30.48 cm, 1 pollice = 2.54 cm)
+# Funzione per la conversione di piede.pollice a centimetri
+
+piedi_cm <- function(str) {
+  if (grepl("\\.", str)) {
+    elem <- as.integer(unlist(strsplit(str, "\\.")))
+    pollici <- elem[1] * 12 + elem[2]
+    return(conv_unit(pollici, "inch", "cm"))
+  } else {
+# esempio: 6 piedi netti
+    piedi <- as.integer(str)
+    return(conv_unit(piedi, "feet", "cm"))
+  }
+}
+
+# applico la funzione, creo una nuova colonna in cm (Visto che userò quella come riferimento, la rinomino Altezza) - sapply applica la funzione a ogni elemento della colonna HT
+dataframe$Altezza_cm <- sapply(dataframe$HT_string, piedi_cm)
+altezze <- dataframe$Altezza_cm
+
+dataframe_pulito <- subset(dataframe, select = -c(HT, WT, Age, Teams, HT_string))
+
+correlazioni <- cor(dataframe_pulito$Altezza_cm, subset(dataframe_pulito, select = -c(Altezza_cm, Player, Pos, Team)))
+```
+
+## QUESITI
+
+Effetti dell'altezza di un giocatore di basket sulle sue prestazioni
+(NBA):
+
+- Nell'NBA, quali prestazioni sono influenzate dall'altezza di un giocatore?
+
+- ...e in che modo (positivo?/negativo?)
+
+<br>
+
+Le "mie" chance: in cosa eccellono i giocatori "bassi (sotto 1.90cm)"?
+*<=187.96cm -> misura in pollici, il prox valore sarebbe 190.5*
+
+
+## DATASET / Ricerca
+
+[https://basketball.realgm.com/nba](https://basketball.realgm.com/nba) ha raccolte pubbliche di dati dei giocatori di NBA.
+
+[Statistiche](https://basketball.realgm.com/nba/stats/2023/Totals/All/player/All/asc/6/Regular_Season) e [altezze](https://basketball.realgm.com/nba/players/2023) hanno rispettivamente gli stats per tutti i 539 giocatori e le loro altezze nella "NBA regular season" 2023 
+
+<br>
+
+*Q: perché proprio la regular season?* 
+
+*Q: perché proprio le statistiche Traditional?* 
+
+
+
+## DATASET / Modifiche
+
+altezze.txt -> il dataset contente le altezze per la regular season 2022-2023 dell'NBA
+
+statistiche.txt -> il dataset contente le statistiche per la regular season 2022-2023 dell'NBA
+
+modifiche effettive ai dataset: 
+- rimuovere variabili di interesse basso/nullo
+- unire i due dataset in un dataframe unico
+- sostituire virgole / apici / "0.000" / formato piedi-pollici / etc
+
+## DATASET / Descrizione
+
+```{r summary}
+# print(summary(dataframe_pulito))
+# cat(colnames(dataframe_pulito))
+```
+Le colonne del nostro dataframe:
+
+<style>
+  #dataframe_col {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  #dataframe_col td {
+    width: 16%; /* Adjust this value to divide the space equally among the columns */
+  }
+</style>
+
+<table id="dataframe_col">
+  <tr>
+    <td>Player</td>
+    <td>Pos</td>
+    <td>Team</td>
+    <td>Altezza_cm</td>
+    <td>GP</td>
+    <td>MIN</td>
+  </tr>
+  <tr>
+    <td>PTS</td>
+    <td style="background-color: #B4D8E7;">FGM</td>
+    <td style="background-color: #B4D8E7;">FGA</td>
+    <td style="background-color: #B4D8E7;">FGP</td>
+    <td style="background-color: #FFD1DC;">TPM</td>
+    <td style="background-color: #FFD1DC;">TPA</td>
+  </tr>
+  <tr>
+    <td style="background-color: #FFD1DC;">TPP</td>
+    <td style="background-color: #C1E7D9;">FTM</td>
+    <td style="background-color: #C1E7D9;">FTA</td>
+    <td style="background-color: #C1E7D9;">FTP</td>
+    <td style="background-color: #E0D1FF;">ORB</td>
+    <td style="background-color: #E0D1FF;">DRB</td>
+  </tr>
+  <tr>
+    <td style="background-color: #E0D1FF;">REB</td>
+    <td>AST</td>
+    <td>STL</td>
+    <td>BLK</td>
+    <td>TOV</td>
+    <td>PF</td>
+  </tr>
+</table>
+
+
+## CONFRONTO DIRETTO / Medie
+
+```{r confronto}
+bassi <- subset(subset(dataframe_pulito, Altezza_cm <= 190), select = -c(Player, Pos, Team, Altezza_cm))
+
+nonbassi <- subset(subset(dataframe_pulito, Altezza_cm > 190), select = -c(Player, Pos, Team, Altezza_cm))
+
+medie_bassi <- colMeans(bassi)
+medie_nonbassi <- colMeans(nonbassi)
+
+medie_diff <- round(medie_bassi - medie_nonbassi, digits=4)
+
+mediane_bassi <- sapply(bassi, median)
+mediane_nonbassi <- sapply(nonbassi, median)
+
+mediane_diff <- round(mediane_bassi - mediane_nonbassi, digits=1)
+
+#print(medie_diff, caption = "differenze delle medie")
+#print(mediane_diff, caption = "differenze delle mediane")
+```
+ Medie: Bassi (<190cm) vs Altri (>=190cm)
+ 
+<table style="margin: 20px;">
+  <tr>
+    <td style="background-color: #FFE5E5;">GP</td>
+    <td style="background-color: #FFE5E5;">MIN</td>
+    <td style="background-color: #FFE5E5;">PTS</td>
+    <td style="background-color: #FFE5E5;">FGM</td>
+    <td style="background-color: #FFE5E5;">FGA</td>
+  </tr>
+  <tr>
+    <td style="background-color: #FFE5E5;">-3.0106</td>
+    <td style="background-color: #FFE5E5;">-51.5397</td>
+    <td style="background-color: #FFE5E5;">-9.7466</td>
+    <td style="background-color: #FFE5E5;">-3.9069</td>
+    <td style="background-color: #FFE5E5;">-19.8130</td>
+  </tr>
+  <tr>
+    <td style="background-color: #FFE5E5;">FGP</td>
+    <td style="background-color: #FFE5E5;">TPM</td>
+    <td style="background-color: #FFE5E5;">TPA</td>
+    <td style="background-color: #FFE5E5;">TPP</td>
+    <td>FTM</td>
+  </tr>
+  <tr>
+    <td style="background-color: #FFE5E5;">-0.0046</td>
+    <td style="background-color: #FFE5E5;">-5.0445</td>
+    <td style="background-color: #FFE5E5;">-13.2169</td>
+    <td style="background-color: #FFE5E5;">-0.0135</td>
+    <td >3.8041</td>
+  </tr>
+  <tr>
+    <td>FTA</td>
+    <td>FTP</td>
+    <td style="background-color: #FFE5E5;">ORB</td>
+    <td style="background-color: #FFE5E5;">DRB</td>
+    <td style="background-color: #FFE5E5;">REB</td>
+  </tr>
+  <tr>
+    <td>1.8098</td>
+    <td>0.0129</td>
+    <td style="background-color: #FFE5E5;">-4.9014</td>
+    <td style="background-color: #FFE5E5;">-14.7711</td>
+    <td style="background-color: #FFE5E5;">-19.6726</td>
+  </tr>
+  <tr>
+    <td>AST</td>
+    <td>STL</td>
+    <td style="background-color: #FFE5E5;">BLK</td>
+    <td>TOV</td>
+    <td style="background-color: #FFE5E5;">PF</td>
+  </tr>
+  <tr>
+    <td>24.5300</td>
+    <td>0.1501</td>
+    <td style="background-color: #FFE5E5;">-1.5175</td>
+    <td>1.1346</td>
+    <td style="background-color: #FFE5E5;">-6.3314</td>
+  </tr>
+</table>
+
+## CONFRONTO DIRETTO / Mediane
+
+Mediane: Bassi (<190cm) vs Altri (>=190cm)
+
+<table style="margin: 20px;">
+  <tr>
+    <td style="background-color: #FFE5E5;">GP</td>
+    <td style="background-color: #FFE5E5;">MIN</td>
+    <td style="background-color: #FFE5E5;">PTS</td>
+    <td style="background-color: #FFE5E5;">FGM</td>
+    <td style="background-color: #FFE5E5;">FGA</td>
+  </tr>
+  <tr>
+    <td style="background-color: #FFE5E5;">-2.0</td>
+    <td style="background-color: #FFE5E5;">-63.0</td>
+    <td style="background-color: #FFE5E5;">-105.5</td>
+    <td style="background-color: #FFE5E5;">-11.5</td>
+    <td style="background-color: #FFE5E5;">-63.5</td>
+  </tr>
+  <tr>
+    <td>FGP</td>
+    <td style="background-color: #FFE5E5;">TPM</td>
+    <td style="background-color: #FFE5E5;">TPA</td>
+    <td>TPP</td>
+    <td style="background-color: #FFE5E5;">FTM</td>
+  </tr>
+  <tr>
+    <td>0.0</td>
+    <td style="background-color: #FFE5E5;">-14.0</td>
+    <td style="background-color: #FFE5E5;">-35.5</td>
+    <td>0.0</td>
+    <td style="background-color: #FFE5E5;">-7.0</td>
+  </tr>
+  <tr>
+    <td style="background-color: #FFE5E5;">FTA</td>
+    <td>FTP</td>
+    <td style="background-color: #FFE5E5;">ORB</td>
+    <td style="background-color: #FFE5E5;">DRB</td>
+    <td style="background-color: #FFE5E5;">REB</td>
+  </tr>
+  <tr>
+    <td style="background-color: #FFE5E5;">-8.0</td>
+    <td>0.0</td>
+    <td style="background-color: #FFE5E5;">-7.0</td>
+    <td style="background-color: #FFE5E5;">-19.0</td>
+    <td style="background-color: #FFE5E5;">-39.0</td>
+  </tr>
+  <tr>
+    <td>AST</td>
+    <td>STL</td>
+    <td style="background-color: #FFE5E5;">BLK</td>
+    <td>TOV</td>
+    <td style="background-color: #FFE5E5;">PF</td>
+  </tr>
+  <tr>
+    <td>2.0</td>
+    <td>0.0</td>
+    <td style="background-color: #FFE5E5;">-4.0</td>
+    <td>0.0</td>
+    <td style="background-color: #FFE5E5;">-1.0</td>
+  </tr>
+</table> 
+
+## CORRELAZIONI / Correlazioni positive
+
+<div class="columns-2">
+
+```{r correlazionipos}
+# correlazioni <- cor(dataframe_pulito$Altezza_cm, subset(dataframe_pulito, select = -c(Altezza_cm, Player, Pos, Team, Altezze_sep)))
+
+for(i in 1:20) {
+  if(correlazioni[i]>0 & correlazioni[i]>0.1)
+    print(paste(colnames(correlazioni)[i], round(correlazioni[i], digits = 3), "***"))
+  else if(correlazioni[i]>0 & correlazioni[i]>(0.05))
+      print(paste(colnames(correlazioni)[i], round(correlazioni[i], digits = 3), "~~~"))
+  else if(correlazioni[i]>0)
+      print(paste(colnames(correlazioni)[i], round(correlazioni[i], digits = 3)))
+}
+```
+
+Quali includere?
+
+<br>
+
+INCLUDO (***): FGP, ORB, DRB, REB, BLK, ~~PF~~
+
+*PF no? -> Meno oggettiva come categoria (soggetta a bias)*
+
+INCLUDO? (~~~); ~~GP (0.062)~~, ~~FTA (0.053)~~
+
+*MIN -> GP è una statistica di tempo di meno valore rispetto a MIN (perché?), e MIN (0.011) non lo prendo*
+
+*FTA -> FTA da sola è di bassa importanza (perché?), e FTM FTP sono entrambi bassi/da scartare*
+
+</div>
+
+## CORRELAZIONI / Correlazioni negative
+
+<div class="columns-2">
+
+```{r correlazionineg}
+# correlazioni <- cor(dataframe_pulito$Altezza_cm, subset(dataframe_pulito, select = -c(Altezza_cm, Player, Pos, Team, Altezze_sep)))
+
+for(i in 1:20) {
+  if(correlazioni[i]<0 & correlazioni[i]<(-0.1)) 
+    print(paste(colnames(correlazioni)[i], round(correlazioni[i], digits = 3), "***"))
+  else if(correlazioni[i]<0 & correlazioni[i]<(-0.05)) #includo STL e TPP?
+      print(paste(colnames(correlazioni)[i], round(correlazioni[i], digits = 3), "~~~"))
+  else if(correlazioni[i]<0)
+      print(paste(colnames(correlazioni)[i], round(correlazioni[i], digits = 3)))
+}
+```
+<br>
+
+Quali includere?
+
+INCLUDO (***): TPM, TPA, AST
+
+INCLUDO? (~~~); TPP, STL
+
+*TPP -> TPM e TPA sono entrambi alti, TTP 0.07 dall'essere accettata*
+
+*STL -> No, per congruenza*
+
+</div>
+
+## COEFFICIENTI NON ATTENDIBILI
+
+``` {r coefficienti non attendibili, echo=FALSE}
+df_interesse <- dataframe[, c("Player", "FGP", "ORB", "DRB", "REB", "BLK", "TPM", "TPA", "TPP", "AST", "Altezza_cm")]
+df_non_interesse <- setdiff(colnames(dataframe), colnames(df_interesse))
+
+for (i in 7:17) {
+  stat <- df_non_interesse[i]
+  
+  formula <- paste(stat, "~ Altezza_cm")
+  
+  modello <- lm(formula, data = dataframe)
+  modello_s <- summary(modello)
+  
+  p_value_altezza <- modello_s$coefficients["Altezza_cm", "Pr(>|t|)"]
+  coeff_altezza <- modello_s$coefficients["Altezza_cm", "Estimate"]
+  
+  #print(paste0("Statistica: ", stat, " Valore p: ", round(p_value_altezza, digits=4), "Coeff: ", round(coeff_altezza, digits=4)))
+  #print("------")
+}
+```
+
+<style>
+  table {
+    width: 100%;
+    height: 80%;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 8px;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+
+  .statistica-colonna {
+    width: 40%;
+  }
+
+  .valore-p-colonna, .coeff-colonna {
+    width: 30%;
+  }
+</style>
+
+<table>
+  <tr>
+    <th>STATISTICA</th>
+    <th>PVALUE</th>
+    <th>COEFF</th>
+  </tr>
+  <tr>
+    <td>GP</td>
+    <td>0.1497</td>
+    <td>0.1796</td>
+  </tr>
+  <tr>
+    <td>MIN</td>
+    <td>0.8069</td>
+    <td>1.0246</td>
+  </tr>
+  <tr>
+    <td>PTS</td>
+    <td>0.9627</td>
+    <td>-0.1141</td>
+  </tr>
+  <tr>
+    <td>FGM</td>
+    <td>0.6058</td>
+    <td>0.466</td>
+  </tr>
+  <tr>
+    <td>FGA</td>
+    <td>0.5913</td>
+    <td>-0.9963</td>
+  </tr>
+  <tr>
+    <td>FTM</td>
+    <td>0.554</td>
+    <td>0.3166</td>
+  </tr>
+  <tr>
+    <td>FTA</td>
+    <td>0.2172</td>
+    <td>0.8098</td>
+  </tr>
+  <tr>
+    <td>FTP</td>
+    <td>0.3285</td>
+    <td>-0.0011</td>
+  </tr>
+</table>
+
+## C.N.A. (continuo)
+
+<table>
+  <tr>
+    <th>STATISTICA</th>
+    <th>PVALUE</th>
+    <th>COEFF</th>
+  </tr>
+  <tr>
+    <td>STL</td>
+    <td>0.049</td>
+    <td>-0.282</td>
+  </tr>
+  <tr>
+    <td>TOV</td>
+    <td>0.5739</td>
+    <td>-0.1659</td>
+  </tr>
+  <tr>
+    <td>PF</td>
+    <td>0.006</td>
+    <td>0.9172</td>
+  </tr>
+</table>
+
+
+
+``` {r coefficienti attendibili}
+for (i in 2:(ncol(df_interesse)-1)) {
+  stat <- colnames(df_interesse)[i]
+  
+  formula <- paste(stat, "~ Altezza_cm")
+  
+  modello <- lm(formula, data = df_interesse)
+  modello_s <- summary(modello)
+  
+  p_value_altezza <- modello_s$coefficients["Altezza_cm", "Pr(>|t|)"]
+  coeff_altezza <- modello_s$coefficients["Altezza_cm", "Estimate"]
+  
+  #print(paste0("Statistica: ", stat, " Valore p: ", p_value_altezza, " Coeff: ", round(coeff_altezza, digits=4)))
+}
+```
+## COEFFICIENTI ATTENDIBILI
+
+<table>
+  <tr>
+    <th>STATISTICA</th>
+    <th>PVALUE</th>
+    <th>COEFF</th>
+  </tr>
+  <tr>
+    <td>FGP</td>
+    <td>2.56173399104235e-12</td>
+    <td>0.0038</td>
+  </tr>
+  <tr>
+    <td>ORB</td>
+    <td>1.16793835727548e-14</td>
+    <td>1.982</td>
+  </tr>
+  <tr>
+    <td>DRB</td>
+    <td>7.62154029745841e-08</td>
+    <td>3.6888</td>
+  </tr>
+  <tr>
+    <td>REB</td>
+    <td>3.5512457686787e-10</td>
+    <td>5.6708</td>
+  </tr>
+  <tr>
+    <td>BLK</td>
+    <td>1.43195001561034e-12</td>
+    <td>0.9293</td>
+  </tr>
+  <tr>
+    <td>TPM</td>
+    <td>0.000684334254032694</td>
+    <td>-1.0419</td>
+  </tr>
+  <tr>
+    <td>TPA</td>
+    <td>0.00063396613634258</td>
+    <td>-2.7696</td>
+  </tr>
+  <tr>
+    <td>TPP</td>
+    <td>0.0310401505404631</td>
+    <td>-0.0015</td>
+  </tr>
+  <tr>
+    <td>AST</td>
+    <td>0.000220006348498501</td>
+    <td>-2.4091</td>
+  </tr>
+</table>
+
+## CORRELAZIONI / Ricapitolando
+```{r dfcorrelazioni, R.options = list(width = 100)}
+summary(subset(df_interesse, select = -Player))
+```
+
+
+
+## CORRELAZIONI / Linear regression
+
+```{r grafici, eval=FALSE, message=FALSE, warning=FALSE}
+
+righe <- ncol(df_interesse) - 1 # Escludo altezza
+
+for (i in 2:righe) { # 2: escludo player
+  stat <- colnames(df_interesse)[i] # FGP/ORB/etc
+  ymin <- min(df_interesse[[stat]])
+  ymax <- max(df_interesse[[stat]])
+  
+  # Creazione del subset di dati per la colonna specifica
+  data_subset <- select(df_interesse, Altezza_cm, !!stat)
+
+  # Scatterplot
+  scatter_plot <- ggplot(data_subset, aes(x = jitter(Altezza_cm, factor = 3), y = .data[[stat]])) +
+    geom_point(shape = 16, color = rgb(139/255, 0, 0), size = 2, alpha = 0.7) +
+    labs(x = "Altezza", y = stat, title = paste("Scatterplot", stat, "- Altezza")) +
+    theme_bw() +
+    xlim(170, 230) + #compenso per lo jitter
+    ylim(ymin, ymax) +
+    geom_smooth(method = "lm", se = FALSE, color = "red")
+    
+    #print(ggMarginal(scatter_plot, type = "histogram", fill = rgb(139/255, 0, 0)))
+}
+```
+
+```{r residui, eval=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+
+righe <- ncol(df_interesse) - 1 # Escludo altezza
+
+for (i in 2:righe) { # 2: escludo player
+  stat <- colnames(df_interesse)[i] # FGP/ORB/etc
+    
+  modello <- lm(Altezza_cm ~ dataframe[[stat]], data = dataframe)
+  istogramma_residui <- hist(residuals(modello), col = "steelblue", main = paste0("lm(ALT / ", stat, "): "))
+  print(istogramma_residui)
+}
+```
+
+```{r, scatterplotsimg, echo=FALSE, out.width="27%", fig.arrange="center", fig.ncol=3}
+knitr::include_graphics(c("./Scatterplots/1", "./Scatterplots/2", "./Scatterplots/3", "./Scatterplots/4", "./Scatterplots/5", "./Scatterplots/6", "./Scatterplots/7", "./Scatterplots/8", "./Scatterplots/9"))
+``` 
+
+## CORRELAZIONI / Istogrammi residui
+```{r, histogramsimg, echo=FALSE, out.width="27%", fig.show="hold", fig.ncol=3}
+knitr::include_graphics(c("./Histograms/1", "./Histograms/2", "./Histograms/3", "./Histograms/4", "./Histograms/5", "./Histograms/6", "./Histograms/7", "./Histograms/8", "./Histograms/9"))
+``` 
+
+## (FGM-FGA-)FGP / Bubble plots
+```{r Tiri da campo (FGP), message=FALSE, warning=FALSE}
+# tipi delle tre colonne
+# dataframe$FGA int
+# dataframe$FGM int
+# dataframe$FGP num
+
+# altezze <- dataframe$Altezza_cm già fatto all'inizio
+
+# prestazioni <- dataframe$FGP <- ora uso "stat" per codice riutilizzabile
+# ordino il dataframe in base alle prestazioni
+# dataframe_ordinato <- dataframe[order(prestazioni), ]
+
+# codice per le heatmap (ora hexbinmap)
+#separatori_punti <- seq(0, 1, by = 0.1)
+#separatori_punti_pochi <- seq(0, 1, by = 0.2)
+#separatori_punti_tanti <- seq(0, 1, by = 0.05)
+#prestazioni10 <- cut(prestazioni, breaks = separatori_punti, include.lowest = TRUE)
+#prestazioni5 <- cut(prestazioni, breaks = separatori_punti_pochi, include.lowest = TRUE)
+#prestazioni20 <- cut(prestazioni, breaks = separatori_punti_tanti, include.lowest = TRUE)
+#datimedi <- table(prestazioni10, altezze10)
+#datipochi <- table(prestazioni5, altezze5)
+#datitanti <- table(prestazioni20, altezzetutte)
+#tabella riassuntiva
+#tabella_freq <- table(dataframe$decile_pts_min, altezze10)
+#tabella_riassuntiva <- addmargins(tabella_freq)
+#tabella_freq <- table(dataframe$quintile_pts_min, altezze5)
+#tabella_riassuntiva <- addmargins(tabella_freq)
+#print(tabella_riassuntiva)
+
+inf_agg <- paste0(dataframe$Player, "\nPos: ", dataframe$Pos, "\nAlt: ", dataframe$Altezza_cm, "\nFGM: ", dataframe$FGM, "\nFGA: ", dataframe$FGA, "\nFGP: ", round(dataframe$FGP, digits = 2)*100, "%")
+
+par(mfrow = c(1, 2))
+
+# bubbleplot
+bubbleplot <- ggplot(dataframe, aes(x = jitter(Altezza_cm, factor = 3), y = FGP, size = FGM, color = Pos, text = inf_agg)) +
+    geom_point(alpha=0.7) +
+    scale_size(range = c(1, 5), name="FGA") +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    theme_ipsum() +
+    theme(legend.position="none")
+# bubbleplot interattivo
+interactive <- ggplotly(bubbleplot, tooltip="text") 
+
+print(interactive)
+```
+
+
+Accorgenza: l'altezza influisce sulla posizione del giocatore?
+
+## POSIZIONE
+
+```{r Posizione, message=FALSE, warning=FALSE}
+
+# tabella riassuntiva
+tabella_freq <- table(dataframe$Pos, dataframe$Altezza_cm)
+tabella_riassuntiva <- addmargins(tabella_freq)
+
+# Stampa la tabella riassuntiva
+# print(tabella_riassuntiva)
+
+# rownames(data) <- c("var1","var2","var3")
+
+etichette_posizioni <- c("Point Guard(PG)", "Shooting Guard(SG)", "Forward(F)", "Small Forward(SF)", "Power Forward-Center(FC)", "Center(C)", "Point Guard(G)", "Power Foward(PF)", "Shooting Guard-Power Forward(GF)")
+
+par(mar=c(5.1,4.1,4.1,15.4), xpd = TRUE)
+
+# Crea lo stacked barplot con le percentuali
+barplot(tabella_freq, 
+        beside = FALSE, 
+        xlab = "Altezza(cm)", 
+        main = "Stacked Barplot",
+        col = viridis(9))
+
+legend("right", inset=c(-0.87, 0),
+       legend = etichette_posizioni,    
+       fill = viridis(9),               
+       title = "Posizioni")
+    
+```
+
+## POSIZIONE (%)
+
+```{r Posizioneperc, message=FALSE, warning=FALSE}
+
+# tabella riassuntiva
+tabella_freq <- table(dataframe$Pos, dataframe$Altezza_cm)
+tabella_riassuntiva <- addmargins(tabella_freq)
+
+# Stampa la tabella riassuntiva
+# print(tabella_riassuntiva)
+
+tabella_perc <- apply(tabella_freq, 2, function(x){x*100/sum(x,na.rm=T)})
+
+# rownames(data) <- c("var1","var2","var3")
+
+etichette_posizioni <- c("Point Guard(PG)", "Shooting Guard(SG)", "Forward(F)", "Small Forward(SF)", "Power Forward-Center(FC)", "Center(C)", "Point Guard(G)", "Power Foward(PF)", "Shooting Guard-Power Forward(GF)")
+
+par(mar=c(5.1,4.1,4.1,15.4), xpd = TRUE)
+
+# Crea lo stacked barplot con le percentuali
+barplot(tabella_perc, 
+        beside = FALSE, 
+        xlab = "Altezza(cm)", 
+        main = "Stacked Barplot",
+        col = viridis(9))
+
+legend("right", inset=c(-0.87, 0),
+       legend = etichette_posizioni,    
+       fill = viridis(9),               
+       title = "Posizioni")
+
+
+    
+```
+
+
+## **ORB**-DRB-REB / Hexbin e Bubble plots
+
+```{r RimbalziOff, message=FALSE, warning=FALSE}
+#warning false perchè log10(0)=NA
+
+# mediane 33, max 237 -> scala logaritmica?
+#decido di non fare scala logaritmica per mantere congruenza con DRB (che non era altrettanto portato)
+
+# tipi delle tre colonne
+# dataframe$ORB int
+# dataframe$DRB int
+# dataframe$REB int
+
+# altezze <- dataframe$Altezza_cm già fatto all'inizio
+
+hexbinx <- jitter(dataframe$Altezza_cm)
+hexbiny <- jitter(dataframe$ORB)
+dati <- data.frame(xvariable = hexbinx, yvariable = hexbiny)
+
+par(mfrow = c(1, 2))
+
+plot <- ggplot(dati, aes(x = xvariable, y = yvariable)) +
+  geom_hex(bins = 10, color = "white") + 
+  scale_fill_continuous(type = "viridis", option ="magma", direction = -1) +
+  ggtitle(paste("Hexbin Plot ORB - Altezza")) +
+  theme_bw() +
+  labs(x = "Altezza", y = "ORB")
+print(plot)
+
+inf_agg <- paste0(dataframe$Player, "\nPos: ", dataframe$Pos, "\nAlt: ", dataframe$Altezza_cm, "\nORB: ", dataframe$ORB, "\nDRB: ", dataframe$DRB, "\nREB: ", dataframe$REB, "\nORB%: ", round(dataframe$ORB/dataframe$REB*100), "%")
+  
+# bubbleplot
+bubbleplot <- ggplot(dataframe, aes(x = jitter(Altezza_cm, factor = 3), y = ORB, size = DRB, color = Pos)) +
+    geom_point(alpha = 0.7, aes(text = inf_agg)) +
+    scale_size(range = c(1, 5), name="ORB") +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    theme_ipsum() +
+    stat_smooth(method = "lm", se=FALSE, color="red") +
+    theme(legend.position="none")
+# bubbleplot interattivo
+interactive <- ggplotly(bubbleplot, tooltip="text") 
+
+print(interactive)
+```
+
+## ORB-**DRB**-REB / Hexbin e Bubble plots
+
+```{r RimbalziDif, message=FALSE, warning=FALSE}
+#warning false perchè log10(0)=NA
+
+#mediana 118, max 744 -> scala log poco conveniente
+
+# tipi delle tre colonne
+# dataframe$ORB int
+# dataframe$DRB int
+# dataframe$REB int
+
+# altezze <- dataframe$Altezza_cm già fatto all'inizio
+
+hexbinx <- jitter(dataframe$Altezza_cm)
+hexbiny <- jitter(dataframe$DRB)
+dati <- data.frame(xvariable = hexbinx, yvariable = hexbiny)
+
+par(mfrow = c(1, 2))
+
+plot <- ggplot(dati, aes(x = xvariable, y = yvariable)) +
+  geom_hex(bins = 10, color = "white") + 
+  scale_fill_continuous(type = "viridis", option ="magma", direction = -1) +
+  ggtitle(paste("Hexbin Plot DRB - Altezza")) +
+  theme_bw() +
+  labs(x = "Altezza", y = "DRB")
+print(plot)
+
+inf_agg <- paste0(dataframe$Player, "\nPos: ", dataframe$Pos, "\nAlt: ", dataframe$Altezza_cm, "\nORB: ", dataframe$ORB,"\nDRB: ", dataframe$DRB, "\nREB: ", dataframe$REB, "\nDRB%: ", round(dataframe$DRB/dataframe$REB*100), "%")
+  
+# bubbleplot
+bubbleplot <- ggplot(dataframe, aes(x = jitter(Altezza_cm, factor = 3), y = DRB, size = ORB, col = Pos)) +
+    geom_point(alpha = 0.7, aes(text = inf_agg)) +
+  # aes va qui perchè aes in ggplot non accetta "paste"
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    scale_size(range = c(1, 5), name="DRB") +
+    theme_ipsum() +
+    stat_smooth(method = "lm", color = "red", se=FALSE) +
+    theme(legend.position="none")
+# bubbleplot interattivo
+interactive <- ggplotly(bubbleplot, tooltip="text") 
+print(interactive)
+```
+
+
+```{r RimbalziTot, message=FALSE, warning=FALSE, echo=FALSE}
+#print(paste("Correlazione ORB-DRB", cor(dataframe_pulito$ORB, dataframe_pulito$DRB)))
+#print(paste("Correlazione ORB-REB", cor(dataframe_pulito$ORB, dataframe_pulito$REB)))
+#print(paste("Correlazione DRB-REB", cor(dataframe_pulito$DRB, dataframe_pulito$REB)))
+
+
+```
+## BLK / Hexbin e Bubble plots
+
+```{r BLK, message=FALSE, warning=FALSE}
+# tipi delle tre colonne
+# dataframe$BLK int
+# mediana 13, max 193 -> scala log10
+
+# altezze <- dataframe$Altezza_cm già fatto all'inizio
+
+hexbinx <- dataframe$Altezza_cm
+hexbiny <- dataframe$BLK
+dati <- data.frame(xvariable = hexbinx, yvariable = hexbiny)
+
+par(mfrow = c(1, 2))
+
+plot <- ggplot(dati, aes(x = xvariable, y = yvariable)) +
+  geom_hex(bins = 20, color = "white") + 
+  scale_fill_continuous(type = "viridis", option="magma", direction = -1) +
+  ggtitle(paste("Hexbin Plot BLK - Altezza")) +
+  theme_bw() +
+  scale_y_log10(breaks = c(0, 1, 10, 100), labels = c("0", "1", "10", "100")) +
+  labs(x = "Altezza", y = "BLK")
+print(plot)
+
+inf_agg <- paste0(dataframe$Player, "\nPos: ", dataframe$Pos, "\nAlt: ", dataframe$Altezza_cm, "\nBLK: ", dataframe$BLK,"\nMIN: ", dataframe$MIN)
+
+# bubbleplot
+bubbleplot <- ggplot(dataframe, aes(x = jitter(Altezza_cm, factor = 3), y = BLK, size = MIN, col = Pos)) +
+    geom_point(alpha = 0.7, aes(text = inf_agg)) +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    theme_ipsum() +
+    scale_size(range = c(1, 5), name="MIN") +
+    stat_smooth(method = "lm", color = "red", se=FALSE) +
+    scale_y_log10() +
+    theme(legend.position="none")
+
+interactive <- ggplotly(bubbleplot, tooltip="text") 
+
+print(interactive)
+```
+
+
+## **TPM**-TPA-TPP / Hexbin e Bubble plots
+
+```{r TPM, message=FALSE, warning=FALSE}
+# tipi delle tre colonne
+# dataframe$TPM int
+# dataframe$TPA int
+# dataframe$TPP num
+
+# mediana 36, max 301 -> uso scala logaritmica
+
+# altezze <- dataframe$Altezza_cm già fatto all'inizio
+
+hexbinx <- dataframe$Altezza_cm
+hexbiny <- dataframe$TPM
+dati <- data.frame(xvariable = hexbinx, yvariable = hexbiny)
+
+plot <- ggplot(dati, aes(x = xvariable, y = yvariable)) +
+  geom_hex(bins = 20, color = "white") + 
+  scale_fill_continuous(type = "viridis", option="magma", direction = -1) +
+  ggtitle(paste("Hexbin Plot TPM - Altezza")) +
+  theme_bw() +
+  scale_y_log10(breaks = c(0, 1, 10, 100), labels = c("0", "1", "10", "100")) +
+  labs(x = "Altezza", y = "TPM")
+print(plot)
+
+inf_agg <- paste0(dataframe$Player, "\nPos: ", dataframe$Pos, "\nAlt: ", dataframe$Altezza_cm, "\nTPM: ", dataframe$TPM, "\nTPA: ", dataframe$TPA, "\nTPP: ", round(dataframe$TPP, digits = 2)*100, "%")
+```
+
+## TPM-TPA-**TPP** / Hexbin e Bubble plots
+
+
+```{r TP, message=FALSE, warning=FALSE}
+# tipi delle tre colonne
+# dataframe$TPM int
+# dataframe$TPA int
+# dataframe$TPP num
+
+# mediana 36, max 301 -> uso scala logaritmica
+
+# altezze <- dataframe$Altezza_cm già fatto all'inizio
+
+hexbinx <- dataframe$Altezza_cm
+hexbiny <- dataframe$TPM
+dati <- data.frame(xvariable = hexbinx, yvariable = hexbiny)
+
+hexbinx <- dataframe$Altezza_cm
+hexbiny <- dataframe$TPP
+dati <- data.frame(xvariable = hexbinx, yvariable = hexbiny)
+
+plot <- ggplot(dati, aes(x = xvariable, y = yvariable)) +
+  geom_hex(bins = 20, color = "white") + 
+  scale_fill_continuous(type = "viridis", option="magma", direction = -1) +
+  ggtitle(paste("Hexbin Plot TPP")) +
+  theme_bw() +
+  labs(x = "Altezza", y = "TPP")
+print(plot)
+
+inf_agg <- paste0(dataframe$Player, "\nPos: ", dataframe$Pos, "\nAlt: ", dataframe$Altezza_cm, "\nTPM: ", dataframe$TPM, "\nTPA: ", dataframe$TPA, "\nTPP: ", round(dataframe$TPP, digits = 2)*100, "%")
+
+
+# bubbleplot
+bubbleplot <- ggplot(dataframe, aes(x = jitter(Altezza_cm, factor = 3), y = TPP, size = TPA, color = Pos)) +
+    geom_point(alpha=0.7, aes(text = inf_agg)) +
+    scale_size(range = c(1, 5)) +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    stat_smooth(method = "lm", color = "red", se=FALSE) +
+    theme_ipsum() +
+    theme(legend.position="none")
+# bubbleplot interattivo
+interactive <- ggplotly(bubbleplot, tooltip="text")
+
+print(interactive)
+```
+
+## AST / Hexbin e Bubble plots
+
+```{r AST, message=FALSE, warning=FALSE}
+# tipi delle tre colonne
+# dataframe$STL int
+# mediana 69, max 741 -> scala log10
+
+# altezze <- dataframe$Altezza_cm già fatto all'inizio
+
+hexbinx <- dataframe$Altezza_cm
+hexbiny <- dataframe$AST
+dati <- data.frame(xvariable = hexbinx, yvariable = hexbiny)
+
+par(mfrow = c(1, 2))
+
+plot <- ggplot(dati, aes(x = xvariable, y = yvariable)) +
+  geom_hex(bins = 20, color = "white") + 
+  scale_fill_continuous(type = "viridis", option="magma", direction = -1) +
+  ggtitle(paste("Hexbin Plot AST")) +
+  theme_bw() +
+  scale_y_log10(breaks = c(0, 1, 10, 100, 1000), labels = c("0", "1", "10", "100", "1000")) +
+  labs(x = "Altezza", y = "AST")
+print(plot)
+
+inf_agg <- paste0(dataframe$Player, "\nPos: ", dataframe$Pos, "\nAlt: ", dataframe$Altezza_cm, "\nAST: ", dataframe$AST,"\nMIN: ", dataframe$MIN)
+
+# bubbleplot
+bubbleplot <- ggplot(dataframe, aes(x = jitter(Altezza_cm, factor = 3), y = STL, size = MIN, col = Pos)) +
+    geom_point(alpha = 0.7, aes(text = inf_agg)) +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    theme_ipsum() +
+    scale_size(range = c(1, 5), name="MIN") +
+    stat_smooth(method = "lm", color = "red", se=FALSE) +
+    scale_y_log10() +
+    theme(legend.position="none")
+
+interactive <- ggplotly(bubbleplot, tooltip="text") 
+
+print(interactive)
+```
+
+
+## RIEPILOGO
+
+Domande:
+  - influenza dell'altezza sulle prestazioni dei giocatori in NBA
+  - in cosa eccellono i giocatori "bassi"?
+<br>
+Dataset:
+  - ricerca
+  - pulizia / modifiche
+<br>
+Confronto diretto iniziale
+  - medie, mediane, etc, tra i vari livelli di altezza
+<br>
+(cont)
+
+## RIEPILOGO (cont)
+
+Analisi delle correlazioni
+  - Calcolo di coefficienti e p-value
+  - Scelta delle categorie di interesse
+<br>
+Visualizzazione e analisi dei grafici
+  - preliminare (linear regression e residui)
+  - approfondita (hexbin e interactive bubble plots)
+
+

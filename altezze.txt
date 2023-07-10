@@ -1,0 +1,540 @@
+Player	Pos	HT	WT	Age	Teams
+Precious Achiuwa	SF	6.8	244	23	TOR
+Steven Adams	C	6.11	265	29	MEM
+Bam Adebayo	C	6.10	255	25	MIA
+Ochai Agbaji	SF	6.5	215	22	UTA
+Santi Aldama	C	6.11	224	22	MEM
+Nickeil Alexander-Walker	SG	6.5	205	24	MIN UTH
+Grayson Allen	SG	6.4	198	27	MIL
+Jarrett Allen	C	6.11	248	24	CLE
+Jose Alvarado	G	6.0	179	24	NOP
+Kyle Anderson	PF	6.9	230	29	MIN
+Giannis Antetokounmpo	F	6.11	242	28	MIL
+Thanasis Antetokounmpo	SF	6.7	215	30	MIL
+Cole Anthony	PG	6.3	195	22	ORL
+OG Anunoby	SF	6.7	240	25	TOR
+Ryan Arcidiacono	G	6.3	195	28	NYK POR
+Deni Avdija	SG	6.9	210	22	WAS
+Deandre Ayton	C	7.1	250	24	PHX
+Udoka Azubuike	C	7.0	270	23	UTA
+Marvin Bagley III	PF	6.11	235	23	DET
+Patrick Baldwin Jr.	SG	6.9	220	20	GSW
+LaMelo Ball	G	6.7	180	21	CHA
+Mohamed Bamba	C	7.0	230	24	LAL ORL
+Paolo Banchero	C	6.10	255	20	ORL
+Desmond Bane	SG	6.6	215	24	MEM
+Dalano Banton	PG	6.7	203	23	TOR
+Dominick Barlow	F	6.10	220	19	SAS
+Harrison Barnes	SF	6.8	225	30	SAC
+Scottie Barnes	SF	6.8	225	21	TOR
+R.J. Barrett	SG	6.7	202	22	NYK
+Will Barton	GF	6.5	181	32	TOR WAS
+Charles Bassey	PF	6.11	230	22	SAS
+Keita Bates-Diop	SF	6.8	230	27	SAS
+Nicolas Batum	F	6.8	230	34	LAC
+Darius Bazley	PF	6.9	216	22	OKC PHX
+Bradley Beal	SG	6.3	207	29	WAS
+Malik Beasley	SG	6.4	187	26	LAL UTH
+MarJon Beauchamp	SG	6.7	202	22	MIL
+Davis Bertans	SF	6.10	225	30	DAL
+Patrick Beverley	PG	6.1	180	34	CHI LAL
+Saddiq Bey	F	6.8	215	23	ATL DET
+Khem Birch	PF	6.8	226	30	TOR
+Goga Bitadze	C	6.11	245	23	IND ORL
+Bismack Biyombo	PF	6.9	255	30	PHX
+Buddy Boeheim	SG	6.6	205	23	DET
+Bogdan Bogdanovic	SG	6.6	220	30	ATL
+Bojan Bogdanovic	F	6.8	216	33	DET
+Bol Bol	C	7.2	220	23	ORL
+Leandro Bolmaro	SG	6.6	200	22	UTA
+Devin Booker	SG	6.6	206	26	PHX
+B.J. Boston Jr.	SG	6.6	188	21	LAC
+Chris Boucher	PF	6.9	198	30	TOR
+James Bouknight	G	6.4	190	22	CHA
+Jamaree Bouyea	G	6.2	180	23	MIA WAS
+Tony Bradley	C	6.10	248	25	CHI
+Malaki Branham	GF	6.5	195	19	SAS
+Jarrell Brantley	SF	6.5	250	26	UTA
+Christian Braun	SF	6.6	210	21	DEN
+Mikal Bridges	SG	6.7	210	26	BRK PHX
+Oshae Brissett	PF	6.7	210	24	IND
+Malcolm Brogdon	SG	6.5	229	30	BOS
+Dillon Brooks	F	6.6	220	27	MEM
+Greg Brown III	SF	6.7	206	21	POR
+Jaylen Brown	SF	6.6	220	26	BOS
+Bruce Brown Jr.	SG	6.4	202	26	DEN
+Troy Brown Jr.	SF	6.6	215	23	LAL
+Kendall Brown	G	6.8	205	19	IND
+Moses Brown	C	7.2	245	23	BRK LAC
+Sterling Brown	G	6.5	219	28	LAL
+Jalen Brunson	PG	6.1	190	26	NYK
+Thomas Bryant	C	6.10	248	25	DEN LAL
+Reggie Bullock	SG	6.6	205	31	DAL
+Alec Burks	SG	6.6	214	31	DET
+Deonte Burton	F	6.4	240	29	SAC
+Jared Butler	PG	6.3	195	22	OKC
+Jimmy Butler	GF	6.8	232	33	MIA
+John Butler	C	7.0	190	20	POR
+Jamal Cain	F	6.7	205	23	MIA
+Kentavious Caldwell-Pope	SG	6.5	204	30	DEN
+Facundo Campazzo	PG	5.11	165	31	DAL
+Vlatko Cancar	SF	6.8	236	25	DEN
+Clint Capela	PF	6.10	240	28	ATL
+Vernon Carey Jr.	PF	6.9	270	22	WAS
+Jevon Carter	PG	6.1	195	27	MIL
+Wendell Carter Jr.	PF	6.10	265	23	ORL
+Michael Carter-Williams	PG	6.6	195	31	ORL
+Alex Caruso	G	6.5	186	29	CHI
+Julian Champagnie	F	6.9	210	21	PHL SAN
+Justin Champagnie	F	6.6	210	21	BOS TOR
+Kennedy Chandler	PG	6.0	171	20	MEM
+Max Christie	F	6.5	190	20	LAL
+Josh Christopher	G	6.5	215	21	HOU
+Brandon Clarke	PF	6.8	210	26	MEM
+Jordan Clarkson	G	6.5	192	30	UTA
+Nicolas Claxton	C	6.11	226	23	BRK
+Amir Coffey	SF	6.7	210	25	LAC
+John Collins	PF	6.9	235	25	ATL
+Zach Collins	C	6.11	250	25	SAS
+Chance Comanche	C	6.10	210	26	POR
+Mike Conley	PG	6.1	175	35	MIN UTH
+Pat Connaughton	SF	6.4	209	30	MIL
+Xavier Cooks	GF	6.8	185	27	WAS
+Robert Covington	F	6.7	209	32	LAC
+Torrey Craig	GF	6.7	221	32	PHX
+Jae Crowder	SF	6.6	235	32	MIL
+Jarrett Culver	SG	6.6	195	24	ATL
+Cade Cunningham	SF	6.6	220	21	DET
+Seth Curry	G	6.1	190	32	BRK
+Stephen Curry	G	6.3	198	34	GSW
+Dyson Daniels	GF	6.8	199	19	NOP
+Anthony Davis	PF	6.10	253	29	LAL
+Johnny Davis	F	6.5	195	21	WAS
+Terence Davis	SF	6.4	201	25	SAC
+J.D. Davison	F	6.1	195	20	BOS
+Darius Days	PF	6.7	240	23	HOU
+Dewayne Dedmon	PF	7.0	245	33	MIA PHL
+Matt Dellavedova	G	6.3	200	32	SAC
+DeMar DeRozan	GF	6.6	220	33	CHI
+Moussa Diabate	PF	6.11	210	21	LAC
+Mamadi Diakite	PF	6.9	224	26	CLE
+Hamidou Diallo	SG	6.5	202	24	DET
+Gorgui Dieng	FC	6.10	250	33	SAS
+Ousmane Dieng	SG	6.10	216	19	OKC
+Spencer Dinwiddie	PG	6.5	215	29	BRK DAL
+Donte DiVincenzo	SG	6.4	206	26	GSW
+Luka Doncic	SF	6.7	230	24	DAL
+Tyler Dorsey	SG	6.5	183	27	DAL
+Luguentz Dort	PG	6.4	220	23	OKC
+Ayo Dosunmu	PG	6.4	200	23	CHI
+Devon Dotson	PG	6.1	185	23	WAS
+Jeff Dowtin	PG	6.3	185	25	TOR
+P.J. Dozier	PG	6.6	205	26	SAC
+Goran Dragic	G	6.3	190	36	CHI MIL
+Andre Drummond	C	6.10	279	29	CHI
+Chris Duarte	PG	6.6	190	25	IND
+David Duke	SG	6.4	207	23	BRK
+Kris Dunn	SG	6.3	205	28	UTA
+Kevin Durant	SF	6.10	225	34	BRK PHX
+Jalen Duren	PF	6.10	250	19	DET
+Tari Eason	F	6.8	216	21	HOU
+Anthony Edwards	SF	6.5	229	21	MIN
+Kessler Edwards	SG	6.8	214	22	BRK SAC
+Keon Ellis	F	6.5	175	23	SAC
+Joel Embiid	C	7.0	280	28	PHI
+Drew Eubanks	C	6.9	245	26	POR
+Bruno Fernando	C	6.9	240	24	ATL HOU
+Dorian Finney-Smith	SF	6.7	220	29	BRK DAL
+Malachi Flynn	PG	6.1	176	24	TOR
+Simone Fontecchio	SF	6.7	200	27	UTA
+Bryn Forbes	G	6.2	205	29	MIN
+Trent Forrest	SG	6.4	210	24	ATL
+Michael Foster Jr.	PF	6.8	250	20	PHI
+Evan Fournier	SG	6.7	205	30	NYK
+DeAaron Fox	PG	6.3	185	25	SAC
+Markelle Fultz	PG	6.4	210	24	ORL
+Wenyen Gabriel	PF	6.9	205	25	LAL
+Daniel Gafford	C	6.10	234	24	WAS
+Darius Garland	G	6.1	186	23	CLE
+Usman Garuba	C	6.8	220	20	HOU
+Luka Garza	C	6.10	243	24	MIN
+Rudy Gay	SF	6.8	240	36	UTA
+Paul George	GF	6.8	220	32	LAC
+Taj Gibson	F	6.9	232	37	WAS
+Josh Giddey	G	6.8	216	20	OKC
+Shai Gilgeous-Alexander	PG	6.6	195	24	OKC
+Anthony Gill	PF	6.8	230	30	WAS
+Jacob Gilyard	PG	5.9	160	24	MEM
+Rudy Gobert	C	7.1	256	30	MIN
+Jordan Goodwin	SG	6.3	200	24	WAS
+Aaron Gordon	F	6.8	235	27	DEN
+Eric Gordon	G	6.3	215	34	HOU LAC
+Devonte Graham	PG	6.1	195	28	NOP SAN
+Jerami Grant	F	6.8	210	28	POR
+Raiquan Gray	PF	6.7	260	23	BRK
+A.J. Green	PG	6.5	207	23	MIL
+Danny Green	SF	6.6	220	35	CLE MEM
+Draymond Green	F	6.6	234	32	GSW
+Jalen Green	SG	6.6	178	21	HOU
+JaMychal Green	PF	6.8	227	32	GSW
+Javonte Green	G	6.5	205	29	CHI
+Jeff Green	F	6.8	235	36	DEN
+Josh Green	SG	6.6	210	22	DAL
+Blake Griffin	PF	6.9	246	33	BOS
+A.J. Griffin Jr.	SG	6.6	222	19	ATL
+Quentin Grimes	SG	6.5	205	22	NYK
+Rui Hachimura	F	6.8	230	25	LAL WAS
+Tyrese Haliburton	PG	6.5	185	23	IND
+Jordan Hall	F	6.8	220	21	SAS
+R.J. Hampton	G	6.6	190	22	DET ORL
+Tim Hardaway Jr.	SG	6.5	205	30	DAL
+James Harden	SG	6.5	220	33	PHI
+Jaden Hardy	SG	6.4	198	20	DAL
+Ron Harper	G	6.6	245	22	TOR
+Montrezl Harrell	F	6.7	240	29	PHI
+Gary Harris	SG	6.4	210	28	ORL
+Joe Harris	SG	6.6	215	31	BRK
+Kevon Harris	SF	6.6	220	25	ORL
+Tobias Harris	F	6.7	230	30	PHI
+Shaquille Harrison	G	6.3	195	29	POR
+Josh Hart	SG	6.5	215	27	NYK POR
+Isaiah Hartenstein	PF	7.0	250	24	NYK
+Udonis Haslem	FC	6.8	235	42	MIA
+Sam Hauser	SF	6.8	215	25	BOS
+Jaxson Hayes	PF	6.11	220	22	NOP
+Killian Hayes	G	6.5	216	21	DET
+Gordon Hayward	GF	6.7	225	32	CHA
+Juancho Hernangomez	F	6.9	215	27	TOR
+Willy Hernangomez	C	6.11	250	28	NOP
+Tyler Herro	SG	6.6	195	23	MIA
+Buddy Hield	G	6.4	220	30	IND
+Haywood Highsmith	F	6.7	220	26	MIA
+George Hill	G	6.3	188	36	IND MIL
+Malcolm Hill	G	6.6	220	27	CHI
+Aaron Holiday	PG	6.0	185	26	ATL
+Jrue Holiday	G	6.4	205	32	MIL
+Justin Holiday	SF	6.6	181	33	ATL DAL
+Richaun Holmes	F	6.10	240	29	SAC
+Al Horford	FC	6.9	240	36	BOS
+Talen Horton-Tucker	SF	6.4	233	22	UTA
+Danuel House	F	6.6	215	29	PHI
+Caleb Houstan	SF	6.8	210	20	ORL
+Trevor Hudgins	G	6.0	180	23	HOU
+Kevin Huerter	SF	6.7	190	24	SAC
+James Huff	C	7.1	240	25	WAS
+DeAndre Hunter	PF	6.7	225	25	ATL
+Bones Hyland	G	6.3	173	22	DEN LAC
+Serge Ibaka	C	6.10	235	33	MIL
+Andre Iguodala	SF	6.6	215	39	GSW
+Joe Ingles	F	6.8	226	35	MIL
+Brandon Ingram	SF	6.7	190	25	NOP
+Kyrie Irving	G	6.2	191	30	BRK DAL
+Jonathan Isaac	SF	6.10	230	25	ORL
+Jaden Ivey	G	6.4	195	21	DET
+Frank Jackson	SG	6.3	205	24	UTA
+Isaiah Jackson	PF	6.10	206	21	IND
+Jaren Jackson Jr.	PF	6.11	242	23	MEM
+Justin Jackson	F	6.8	220	27	BOS
+Quenton Jackson	GF	6.5	173	24	WAS
+Reggie Jackson	G	6.2	208	32	DEN LAC
+LeBron James	F	6.8	250	38	LAL
+Ty Jerome	PG	6.5	195	25	GSW
+Isaiah Joe	SG	6.3	174	23	OKC
+Alize Johnson	SF	6.7	210	26	SAS
+Cameron Johnson	G	6.9	210	26	BRK PHX
+Jalen Johnson	PF	6.9	220	21	ATL
+James Johnson	F	6.7	240	36	IND
+Keldon Johnson	SF	6.6	210	23	SAS
+Keon Johnson	PG	6.3	185	20	POR
+Stanley Johnson	G	6.6	242	26	SAS
+Nikola Jokic	C	7.0	284	28	DEN
+Carlik Jones	PG	6.1	185	25	CHI
+Damian Jones	PF	7.0	245	27	LAL UTH
+Derrick Jones	SF	6.6	210	26	CHI
+Herb Jones	SF	6.6	206	24	NOP
+Kai Jones	PF	6.10	221	22	CHA
+Tre Jones	PG	6.2	185	23	SAS
+Tyus Jones	PG	6.1	196	26	MEM
+DeAndre Jordan	C	6.11	265	34	DEN
+Cory Joseph	PG	6.3	200	31	DET
+Nikola Jovic	F	6.11	225	19	MIA
+Johnny Juzang	SG	6.7	215	21	UTA
+Mfiondu Kabengele	SF	6.10	250	25	BOS
+Frank Kaminsky	F	7.0	242	29	ATL HOU
+Trevor Keels	PG	6.4	221	19	NYK
+Luke Kennard	SG	6.5	206	26	LAC MEM
+Walker Kessler	C	7.1	245	21	UTA
+Braxton Key	SF	6.8	225	26	DET
+Louis King	SF	6.7	205	23	PHI
+Corey Kispert	SF	6.7	220	23	WAS
+Maxi Kleber	PF	6.10	240	31	DAL
+Nathan Knight	PF	6.8	244	25	MIN
+Kevin Knox	SF	6.7	215	23	DET POR
+Christian Koloko	C	7.1	230	22	TOR
+John Konchar	G	6.5	210	26	MEM
+Furkan Korkmaz	SG	6.7	210	25	PHI
+Luke Kornet	F	7.2	252	27	BOS
+Vit Krejci	PG	6.8	195	22	ATL
+Jonathan Kuminga	F	6.7	227	20	GSW
+Kyle Kuzma	F	6.10	221	27	WAS
+Anthony Lamb	PF	6.6	225	25	GSW
+Jock Landale	C	6.11	255	27	PHX
+Romeo Langford	SG	6.5	215	23	SAS
+Jake LaRavia	F	6.7	235	21	MEM
+Zach LaVine	SG	6.5	200	27	CHI
+A.J. Lawson	F	6.6	185	22	DAL MIN
+Damion Lee	G	6.5	203	30	PHX
+Saben Lee	PG	6.2	183	23	PHL PHX
+Alex Len	C	7.0	250	29	SAC
+Kawhi Leonard	F	6.7	225	31	LAC
+Meyers Leonard	C	7.1	255	31	MIL
+Caris LeVert	G	6.6	205	28	CLE
+Kira Lewis Jr.	PG	6.1	170	21	NOP
+Damian Lillard	G	6.2	200	32	POR
+Nassir Little	SF	6.5	220	23	POR
+Isaiah Livers	PF	6.7	230	24	DET
+Kenny Lofton Jr.	F	6.8	275	20	MEM
+Kevon Looney	PF	6.9	249	27	GSW
+Brook Lopez	C	7.0	270	34	MIL
+Robin Lopez	FC	7.0	275	34	CLE
+Kevin Love	FC	6.8	247	34	CLE MIA
+Kyle Lowry	PG	6.1	196	36	MIA
+Trey Lyles	SF	6.9	234	27	SAC
+Theo Maledon	PG	6.5	190	21	CHA
+Sandro Mamukelashvili	F	6.11	245	23	MIL SAN
+Terance Mann	SG	6.5	215	26	LAC
+Tre Mann	PG	6.5	190	22	OKC
+Boban Marjanovic	C	7.4	290	34	HOU
+Lauri Markkanen	SF	7.0	238	25	UTA
+Naji Marshall	SF	6.7	220	25	NOP
+Caleb Martin	F	6.7	205	27	MIA
+Cody Martin	F	6.6	205	27	CHA
+K.J. Martin	F	6.7	215	22	HOU
+Tyrese Martin	GF	6.6	215	23	ATL
+Garrison Mathews	SG	6.5	215	26	ATL HOU
+Bennedict Mathurin	GF	6.6	195	20	IND
+Wesley Matthews	G	6.5	220	36	MIL
+Tyrese Maxey	PG	6.2	195	22	PHI
+Skylar Mays	PG	6.4	205	25	POR
+Miles McBride	G	6.2	196	22	NYK
+Mac McClung	PG	6.2	185	24	PHI
+C.J. McCollum	G	6.3	200	31	NOP
+T.J. McConnell	G	6.2	190	30	IND
+Jaden McDaniels	F	6.10	185	22	MIN
+Jalen McDaniels	PF	6.9	205	25	CHA PHL
+Doug McDermott	F	6.8	225	31	SAS
+JaVale McGee	C	7.0	270	35	DAL
+Bryce McGowens	GF	6.6	175	20	CHA
+Rodney McGruder	SG	6.4	205	31	DET
+Jordan McLaughlin	G	5.11	185	26	MIN
+DeAnthony Melton	SG	6.2	200	24	PHI
+Sam Merrill	G	6.5	205	26	CLE
+Chimezie Metu	PF	6.9	225	25	SAC
+Khris Middleton	SF	6.8	222	31	MIL
+Patty Mills	G	6.0	180	34	BRK
+Shake Milton	SG	6.5	215	26	PHI
+Justin Minaya	F	6.7	210	23	POR
+Josh Minott	F	6.9	197	20	MIN
+Davion Mitchell	PG	6.2	205	24	SAC
+Donovan Mitchell	SG	6.3	215	26	CLE
+Evan Mobley	PF	7.0	215	21	CLE
+Isaiah Mobley	SF	6.10	240	23	CLE
+Chima Moneke	F	6.6	222	27	SAC
+Malik Monk	SG	6.3	200	25	SAC
+Moses Moody	SG	6.5	210	20	GSW
+Xavier Moon	SG	6.2	165	28	LAC
+Wendell Moore Jr.	SF	6.6	217	21	MIN
+Ja Morant	G	6.3	175	23	MEM
+Marcus Morris	F	6.8	218	33	LAC
+Markieff Morris	PF	6.9	250	33	BRK DAL
+Monte Morris	G	6.2	183	27	WAS
+Trey Murphy III	G	6.8	208	22	NOP
+Dejounte Murray	SG	6.5	180	26	ATL
+Jamal Murray	SG	6.4	215	26	DEN
+Keegan Murray	F	6.8	215	22	SAC
+Mike Muscala	FC	6.11	240	31	BOS OKC
+Svi Mykhailiuk	SF	6.8	205	25	CHA NYK
+Larry Nance Jr.	SF	6.7	245	30	NOP
+Andrew Nembhard	PG	6.5	193	23	IND
+Aaron Nesmith	F	6.6	213	23	IND
+Raulzinho Neto	PG	6.1	179	30	CLE
+Georges Niang	F	6.7	235	29	PHI
+Daishen Nix	GF	6.5	224	21	HOU
+Zeke Nnaji	PF	6.11	240	22	DEN
+Nerlens Noel	FC	6.11	220	28	BRK DET
+Jaylen Nowell	SG	6.4	197	23	MIN
+Frank Ntilikina	PG	6.5	200	24	DAL
+Kendrick Nunn	SG	6.3	195	27	LAL WAS
+Jusuf Nurkic	FC	7.0	290	28	POR
+Jordan Nwora	F	6.8	226	24	IND MIL
+Royce ONeale	SF	6.6	220	29	BRK
+Chuma Okeke	PF	6.8	230	24	ORL
+Josh Okogie	SG	6.4	220	24	PHX
+Onyeka Okongwu	PF	6.9	245	22	ATL
+Isaac Okoro	SG	6.5	225	22	CLE
+KZ Okpala	SG	6.8	215	23	SAC
+Victor Oladipo	G	6.4	210	30	MIA
+Kelly Olynyk	C	6.11	240	31	UTA
+Eugene Omoruyi	F	6.7	244	26	DET OKC
+Cedi Osman	GF	6.7	230	27	CLE
+Kelly Oubre Jr.	SF	6.6	203	27	CHA
+Chris Paul	PG	6.0	175	37	PHX
+Cameron Payne	G	6.3	190	28	PHX
+Gary Payton II	G	6.3	195	30	GOS POR
+Theo Pinson	SG	6.5	212	27	DAL
+Scotty Pippen Jr.	G	6.1	185	22	LAL
+Mason Plumlee	PF	6.11	254	32	CHA LAC
+Jakob Poeltl	C	7.0	240	27	SAN TOR
+Aleksej Pokusevski	C	7.0	210	21	OKC
+Jordan Poole	SG	6.4	192	23	GSW
+Kevin Porter Jr.	SF	6.4	203	22	HOU
+Michael Porter Jr.	PF	6.10	218	24	DEN
+Otto Porter	SF	6.8	228	29	TOR
+Bobby Portis	PF	6.11	250	28	MIL
+Kristaps Porzingis	FC	7.3	240	27	WAS
+Micah Potter	C	6.10	240	24	UTA
+Dwight Powell	PF	6.10	240	31	DAL
+Norman Powell	SG	6.3	215	29	LAC
+Jason Preston	G	6.3	181	23	LAC
+Joshua Primo	G	6.5	190	20	SAS
+Taurean Prince	F	6.7	218	28	MIN
+Payton Pritchard	PG	6.2	190	25	BOS
+Trevelin Queen	G	6.6	190	26	IND
+Neemias Queta	C	7.0	245	23	SAC
+Immanuel Quickley	PG	6.3	188	23	NYK
+Lester Quinones	SG	6.4	208	22	GSW
+Julius Randle	PF	6.9	250	28	NYK
+Austin Reaves	PG	6.5	206	24	LAL
+Cam Reddish	G	6.8	218	23	NYK POR
+Davon Reed	SF	6.5	208	27	DEN LAL
+Paul Reed Jr.	F	6.8	218	23	PHI
+Naz Reid	C	6.9	250	23	MIN
+Jared Rhoden	SG	6.6	210	23	DET
+Nick Richards	C	7.0	245	25	CHA
+Josh Richardson	G	6.5	200	29	NOP SAN
+Austin Rivers	SG	6.4	200	30	MIN
+Duncan Robinson	F	6.8	210	28	MIA
+Mitchell Robinson	C	7.1	240	24	NYK
+Orlando Robinson	PF	6.11	245	22	MIA
+Jeremiah Robinson-Earl	PF	6.9	240	22	OKC
+Isaiah Roby	SF	6.8	230	25	SAS
+David Roddy	F	6.5	255	21	MEM
+Ryan Rollins	G	6.4	180	20	GSW
+Derrick Rose	PG	6.3	200	34	NYK
+Terrence Ross	SF	6.7	205	32	ORL PHX
+Terry Rozier	G	6.1	190	28	CHA
+Ricky Rubio	G	6.3	190	32	CLE
+DAngelo Russell	SG	6.4	193	27	LAL MIN
+Matt Ryan	SF	6.7	215	25	LAL MIN
+Domantas Sabonis	PF	6.11	240	26	SAC
+Luka Samanic	PF	6.10	227	23	UTA
+Dario Saric	SF	6.10	250	28	OKC PHX
+Olivier Sarr	FC	7.0	240	24	OKC
+Jordan Schakel	SF	6.6	200	24	WAS
+Admiral Schofield	SF	6.5	240	25	ORL
+Dennis Schroder	PG	6.3	172	29	LAL
+Jay Scrubb	SG	6.5	220	22	ORL
+Dereon Seabron	SG	6.7	180	22	NOP
+Alperen Sengun	C	6.9	235	20	HOU
+Collin Sexton	PG	6.1	192	24	UTA
+Landry Shamet	PG	6.4	190	25	PHX
+DayRon Sharpe	PF	6.9	255	21	BRK
+Shaedon Sharpe	F	6.5	200	19	POR
+Pascal Siakam	F	6.8	240	28	TOR
+Chris Silva	PF	6.8	234	26	DAL
+Ben Simmons	PF	6.10	240	26	BRK
+Kobi Simmons	PG	6.5	166	25	CHA
+Marko Simonovic	C	7.0	220	23	CHI
+Anfernee Simons	SG	6.3	195	23	POR
+Jericho Sims	C	6.10	240	24	NYK
+Marcus Smart	PG	6.3	220	28	BOS
+Dennis Smith	PG	6.2	205	25	CHA
+Dru Smith	SG	6.3	200	25	BRK MIA
+Ish Smith	PG	6.0	175	34	DEN
+Jalen Smith	C	6.10	215	22	IND
+Jabari Smith Jr.	F	6.10	220	19	HOU
+Xavier Sneed	SF	6.5	215	25	CHA
+Jeremy Sochan	SG	6.8	225	19	SAS
+Jaden Springer	SG	6.4	205	20	PHI
+Lamar Stevens	SF	6.8	225	25	CLE
+Isaiah Stewart II	C	6.9	250	21	DET
+Max Strus	G	6.5	220	26	MIA
+Jalen Suggs	SG	6.5	210	21	ORL
+Edmond Sumner	G	6.4	185	27	BRK
+Cole Swider	F	6.9	220	23	LAL
+Jaesean Tate	F	6.4	230	27	HOU
+Jayson Tatum	SF	6.8	210	24	BOS
+Terry Taylor	GF	6.5	230	23	CHI IND
+Garrett Temple	G	6.5	195	36	NOP
+Dalen Terry	PG	6.7	200	20	CHI
+Daniel Theis	C	6.8	245	30	IND
+Cam Thomas	PG	6.3	208	21	BRK
+Klay Thompson	G	6.6	210	33	GSW
+J.T. Thor	PF	6.9	205	20	CHA
+Matisse Thybulle	SF	6.5	205	25	PHL POR
+Xavier Tillman Sr.	PF	6.8	245	24	MEM
+Isaiah Todd	PF	6.10	210	21	WAS
+Obi Toppin	F	6.9	193	24	NYK
+Juan Toscano-Anderson	F	6.6	213	29	LAL UTH
+Karl-Anthony Towns	C	7.0	250	27	MIN
+Gary Trent Jr.	SG	6.5	205	24	TOR
+P.J. Tucker	SF	6.6	245	37	PHI
+Myles Turner	FC	6.11	250	26	IND
+Stanley Umude	G	6.6	210	23	DET
+Jonas Valanciunas	C	7.0	265	30	NOP
+Jarred Vanderbilt	PF	6.8	214	23	LAL UTH
+Fred VanVleet	G	6.0	200	29	TOR
+Devin Vassell	SG	6.6	195	22	SAS
+Gabe Vincent	G	6.3	195	26	MIA
+Noah Vonleh	FC	6.10	257	27	BOS
+Nikola Vucevic	PF	6.11	260	32	CHI
+Dean Wade	PF	6.9	219	26	CLE
+Franz Wagner	SF	6.10	225	21	ORL
+Moe Wagner	PF	6.11	240	25	ORL
+Ish Wainright	GF	6.5	235	28	PHX
+Jabari Walker	F	6.7	200	20	POR
+Kemba Walker	G	6.0	184	32	DAL
+Lonnie Walker	SG	6.5	205	24	LAL
+John Wall	PG	6.3	210	32	LAC
+T.J. Warren	F	6.8	222	29	BRK PHX
+Duane Washington Jr.	G	6.3	210	22	PHX
+TyTy Washington Jr.	PG	6.3	197	21	HOU
+P.J. Washington	PF	6.7	230	24	CHA
+Yuta Watanabe	F	6.8	214	28	BRK
+Lindy Waters III	SG	6.6	210	25	OKC
+Trendon Watford	SF	6.8	237	22	POR
+Peyton Watson	GF	6.8	200	20	DEN
+Blake Wesley	SG	6.4	190	19	SAS
+Russell Westbrook	G	6.3	200	34	LAC LAL
+Coby White	PG	6.4	195	23	CHI
+Derrick White	G	6.4	195	28	BOS
+Jack White	SF	6.7	222	25	DEN
+Joe Wieskamp	SF	6.6	210	23	TOR
+Aaron Wiggins	F	6.6	200	24	OKC
+Andrew Wiggins	F	6.7	203	28	GSW
+Lindell Wigginton	SG	6.1	189	24	MIL
+Alondes Williams	G	6.4	205	23	BRK
+Donovan Williams	F	6.6	190	21	ATL
+Grant Williams	SF	6.6	236	24	BOS
+Jalen Williams	G	6.6	211	21	OKC
+Jaylin Williams	C	6.10	240	20	OKC
+Nate Williams Jr.	SG	6.5	206	24	POR
+Vincent Williams Jr.	SF	6.6	205	22	MEM
+Kenrich Williams	SF	6.7	210	28	OKC
+Mark Williams	C	7.1	242	21	CHA
+Patrick Williams	G	6.7	215	21	CHI
+Robert Williams	PF	6.8	240	25	BOS
+Ziaire Williams	F	6.9	185	21	MEM
+Zion Williamson	PF	6.6	284	22	NOP
+Dylan Windler	SF	6.6	199	26	CLE
+Justise Winslow	SF	6.6	222	26	POR
+James Wiseman	C	7.0	240	21	DET GOS
+Christian Wood	PF	6.10	223	27	DAL
+McKinley Wright IV	PG	5.11	192	24	DAL
+Delon Wright	G	6.5	185	30	WAS
+Gabe York	SG	6.3	185	29	IND
+Thaddeus Young	F	6.8	235	34	TOR
+Trae Young	PG	6.1	180	24	ATL
+Omer Yurtseven	C	6.11	255	24	MIA
+Cody Zeller	F	6.11	240	30	MIA
+Ivica Zubac	C	7.0	240	25	LAC
