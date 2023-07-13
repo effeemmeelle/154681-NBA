@@ -1,0 +1,663 @@
+---
+title: "Impatto dell'altezza sulla prestazione dei giocatori di NBA"
+author: 'Federico Mizzaro'
+date: "2023-07-14"
+output:
+  ioslides_presentation:
+    widescreen: true
+  beamer: deafult
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+#PACCHETTI E LIBRERIE
+
+# install.packages("measurements")
+#install.packages("hexbin")
+#install.packages("RColorBrewer")
+#install.packages("ggplot2")
+#install.packages("ggpubr")
+#install.packages("tidyverse") #contiene ggplot2, dplyr, tidyr
+#install.packages("broom")
+#install.packages("AICcmodavg")
+#install.packages("car")
+#install.packages("ggExtra")
+#install.packages("gridExtra")
+#install.packages("viridis")
+#install.packages("hrbrthemes")
+#install.packages("dplyr")
+#install.packages("plotly")
+
+
+library(measurements)
+library(knitr)
+library(hexbin)
+library(RColorBrewer)
+library(ggplot2)
+library(ggpubr)
+library(tidyverse)
+library(broom)
+library(AICcmodavg)
+library(car)
+library(ggExtra)
+library(gridExtra)
+library(viridis)
+library(hrbrthemes)
+library(dplyr)
+library(plotly)
+```
+
+## INTRODUZIONE / Studio sulla performance dei giocatori di NBA
+
+Come e quanto l'altezza di un giocatore di basket influenza:
+
+1. il ruolo giocato
+
+2. le prestazioni
+
+## DATASET
+
+Raccolte pubbliche di dati dei giocatori NBA: [https://basketball.realgm.com/nba](https://basketball.realgm.com/nba)
+
+* Dati di interesse:
+  * Dataset contenente le statistiche "traditional" sulle prestazioni dei 539 giocatori di NBA nella regular season 2022/2023: [https://basketball.realgm.com/nba/stats/2023/Totals/Regular_Season](https://basketball.realgm.com/nba/stats/2023/Totals/Regular_Season) -> statistiche.txt
+
+  *  Dataset contenente le caratteristiche (tra cui l'altezza) dei giocatori dei 539 giocatori di NBA nella regular season 2022/2023: [https://basketball.realgm.com/nba/players/2023](https://basketball.realgm.com/nba/players/2023) -> altezze.txt
+
+
+## DATASET NEL DETTAGLIO
+
+```{r summary}
+# print(summary(dataframe))
+# cat(colnames(dataframe))
+```
+
+statistiche.txt (539 righe/giocatori, 22 colonne/Variabili)
+
+* mi concentro su:
+  * Team, GP(Games Played), MIN (Minutes played), PTS(Total points), 
+  * FGM, FGA, FGP (Field goals: made, attempted, %), 
+  * TPM, TPA, TPP (Three-pointers: made, attempted, %), 
+  * FTM, FTA, FTP (Free throws: made, attempted, %), 
+  * ORB, DRB, REB (Rebounds: Offensive, defensive, total),
+  * AST (Assists), STL(Stals), BLK (Blocks), TOV(Turnovers), PF(Personal fouls)
+
+altezze.txt (539 righe/giocatori, 11 colonne /variabili):
+  * 2 di interesse e non ridondanti con statistiche.txt: HT(Height) e POS(Position)
+
+## TIDYING / Modifiche sui dataset
+
+```{r script iniziali}
+# OTTENGO IL DATASET (.txt -> csv) E LO PULISCO
+
+# Leggo i file .txt (header=TRUE perchè i dataset presentano intestazione nella prima riga)
+altezze <- read.table("altezze.txt", header = TRUE, sep = "\t")
+statistiche <- read.table("statistiche.txt", header = TRUE, sep = "\t")
+
+# creo i file corrispondenti .csv
+write.csv(altezze, "altezze.csv", row.names = FALSE)
+write.csv(statistiche, "statistiche.csv", row.names = FALSE)
+
+# ricarico i due dataset, ora in formato csv
+altezze <- read.csv("altezze.csv")
+statistiche <- read.csv("statistiche.csv")
+
+# Unione dei dataset basata sulla colonna in comune (Players) con il comando merge
+dataframe <- merge(altezze, statistiche, by = "Player")
+
+# controllare i nomi delle colonne nel mio dataframe
+# print(colnames(dataframe))
+
+# conversione della colonna HT (height), in stringhe per poterli convertire in cm (come numeri, 5 piedi e 10/11 pollici verrebbe altrimenti letti come i numero 5.10 e 5.11)
+dataframe$HT_string <- as.character(dataframe$HT)
+
+# Converto i valori di altezza in piedi e pollici in centimetri (\\. indica che lo split avviene al punto; 1 piede = 12 pollici = 30.48 cm, 1 pollice = 2.54 cm)
+# Funzione per la conversione di piede.pollice a centimetri
+
+piedi_cm <- function(str) {
+  if (grepl("\\.", str)) {
+    elem <- as.integer(unlist(strsplit(str, "\\.")))
+    pollici <- elem[1] * 12 + elem[2]
+    return(conv_unit(pollici, "inch", "cm"))
+  } else {
+# esempio: 6 piedi netti
+    piedi <- as.integer(str)
+    return(conv_unit(piedi, "feet", "cm"))
+  }
+}
+
+# applico la funzione, creo una nuova colonna in cm (Visto che userò quella come riferimento, la rinomino Altezza) - sapply applica la funzione a ogni elemento della colonna HT
+dataframe$Altezza_cm <- sapply(dataframe$HT_string, piedi_cm)
+altezze <- dataframe$Altezza_cm
+
+# colonne dei valori "individuali" in funzione del tempo giocato
+
+dataframe$PTS_MIN <- dataframe$PTS/dataframe$MIN
+dataframe$ORB_MIN <- dataframe$ORB/dataframe$MIN
+dataframe$DRB_MIN <- dataframe$DRB/dataframe$MIN
+dataframe$REB_MIN <- dataframe$REB/dataframe$MIN
+dataframe$AST_MIN <- dataframe$AST/dataframe$MIN
+dataframe$STL_MIN <- dataframe$STL/dataframe$MIN
+dataframe$BLK_MIN <- dataframe$BLK/dataframe$MIN
+dataframe$TO_MIN <- dataframe$TO/dataframe$MIN
+dataframe$PF_MIN <- dataframe$PF/dataframe$MIN
+
+
+dataframe_pulito <- subset(dataframe, select = c(Player, Pos, Team, GP, MIN, PTS_MIN, FGM, FGA, FGP, TPM, TPA, TPP, FTM, FTA, FTP, ORB_MIN, DRB_MIN, REB_MIN, AST_MIN, STL_MIN, BLK_MIN, TO_MIN, PF_MIN, Altezza_cm))
+```
+* trasformato i file .txt in fogli di calcolo .csv
+* rimosso variabili non rilevanti in altezze.csv
+* sostituito:
+  * virgole (es: "1,000 -> 1000"; "A.J. Griffin, Jr." -> "A.J. Griffin Jr.")
+  * ".000" -> "0"
+  * numeri (es: 3PA -> TPA) / caratteri speciali (es: FG% -> FGP) con lettere nell'intestazione
+* importato i due fogli di calcolo, unendoli in un dataframe unico
+* convertito le altezze dal formato piedi.pollici in cm
+* sostituito le variabili "secche" con quelle in funzione del tempo giocato (es: PTS -> PTS/MIN)
+
+## CORRELAZIONI STATS-ALTEZZA / Pearson
+
+```{r correlazioni pearson, fig.align='center'}
+
+correlazione_df <- data.frame(stat = character(), correlation = numeric(), stringsAsFactors = FALSE)
+
+altezza_col <- "Altezza_cm"
+stat_col <- colnames(subset(dataframe_pulito, select = -c(Player, Pos, Team, Altezza_cm)))
+
+for (col in stat_col) {
+  correlazione <- cor(dataframe_pulito[[col]], dataframe_pulito[[altezza_col]])
+  correlazione_df <- rbind(correlazione_df, data.frame(statistica = col, correlazione = correlazione))
+}
+
+correlazione_df <- correlazione_df[order(correlazione_df$correlazione, decreasing = TRUE), ]
+
+
+barplot(correlazione_df$correlazione, ylab = "CORRELAZIONE (PEARSON)", main = "GRAFICO A BARRE DELLE CORRELAZIONI (PEARSON)\n TRA VARIABILI DI INTERESSE E ALTEZZA", names.arg = correlazione_df$statistica, las=2, col = ifelse(abs(correlazione_df$correlazione) > 0.09,"blue","lightblue"), space = 1, width = 30)
+
+#for(i in 1:nrow(correlazione_df)) {
+#  if(abs(correlazione_df$correlazione[i]) >= 0.10) {cat(paste0(correlazione_df$statistica[i], "(", round(correlazione_df$correlazione[i], digits = 2), ") "))}
+#}
+
+```
+
+## ATTENDIBILITA' (P-VALUE)
+
+<style>
+  table {
+    width: 100%;
+    height: 80%;
+  }
+</style>
+<table>
+  <tr>
+    <th>STATISTICA</th>
+    <th>CORRELAZIONE</th>
+    <th>P-VALUE</th>
+  </tr>
+```{r pvalue, results='asis'}
+
+
+for(i in 1:nrow(correlazione_df)) {
+    stat <- correlazione_df$statistica[i]
+    abscor <- abs(correlazione_df$correlazione[i])
+    if(abscor > 0.09)
+      cat(paste0("<tr><td>", stat, "</td><td>", round(correlazione_df$correlazione[i], digits=3), "</td><td>", cor.test(dataframe[[stat]], dataframe$Altezza_cm)$p.value, "</td></tr>"))
+}
+ 
+  
+  #print(paste0("Statistica: ", stat, " Valore p: ", round(p_value_altezza, digits=4), "Coeff: ", round(coeff_altezza, digits=4)))
+```
+</table>
+
+## CORRELAZIONI STATS-ALTEZZA / Kendall
+
+```{r correlazioni kendall, fig.align='center'}
+
+correlazione_df <- data.frame(stat = character(), correlation = numeric(), stringsAsFactors = FALSE)
+
+altezza_col <- "Altezza_cm"
+stat_col <- colnames(subset(dataframe_pulito, select = -c(Player, Pos, Team, Altezza_cm)))
+
+for (col in stat_col) {
+  correlazione <- cor(dataframe_pulito[[col]], dataframe_pulito[[altezza_col]], method = "kendall")
+  correlazione_df <- rbind(correlazione_df, data.frame(statistica = col, correlazione = correlazione))
+}
+
+correlazione_df <- correlazione_df[order(correlazione_df$correlazione, decreasing = TRUE), ]
+
+
+barplot(correlazione_df$correlazione, ylab = "CORRELAZIONE (KENDALL)", main = "GRAFICO A BARRE DELLE CORRELAZIONI (KENDALL)\n TRA VARIABILI DI INTERESSE E ALTEZZA", names.arg = correlazione_df$statistica, las=2, col = ifelse(abs(correlazione_df$correlazione) > 0.10,"blue","lightblue"), space = 1, width = 30)
+
+#for(i in 1:nrow(correlazione_df)) {
+#  if(abs(correlazione_df$correlazione[i]) >= 0.10) {cat(paste0(correlazione_df$statistica[i], "(", round(correlazione_df$correlazione[i], digits = 2), ") "))}
+#}
+
+```
+
+## ATTENDIBILITA' (P-VALUE)
+
+
+<style>
+  table {
+    width: 100%;
+    height: 80%;
+  }
+</style>
+<table>
+  <tr>
+    <th>STATISTICA</th>
+    <th>CORRELAZIONE</th>
+    <th>P-VALUE</th>
+  </tr>
+```{r pvalue kendall, results='asis'}
+
+
+for(i in 1:nrow(correlazione_df)) {
+    stat <- correlazione_df$statistica[i]
+    abscor <- abs(correlazione_df$correlazione[i])
+    if(abscor > 0.10)
+      cat(paste0("<tr><td>", stat, "</td><td>", round(correlazione_df$correlazione[i], digits=3), "</td><td>", cor.test(dataframe[[stat]], dataframe$Altezza_cm, method="kendall")$p.value, "</td></tr>"))
+}
+ 
+  
+  #print(paste0("Statistica: ", stat, " Valore p: ", round(p_value_altezza, digits=4), "Coeff: ", round(coeff_altezza, digits=4)))
+```
+</table>
+
+## SUDDIVISIONE IN QUARTILI
+
+```{r quartili}
+# summary(dataframe$Altezza_cm)
+
+# min 175.3
+quartile1 <- summary(dataframe$Altezza_cm)[[2]] # 191.35
+quartile2 <- summary(dataframe$Altezza_cm)[[3]] #mediana 198.1
+quartile3 <- summary(dataframe$Altezza_cm)[[5]] # 203.2
+# max 223.5
+
+dataframe_pulito$Quartili <- cut(dataframe_pulito$Altezza_cm, breaks = c(min(dataframe_pulito$Altezza_cm), quartile1, quartile2, quartile3, max(dataframe_pulito$Altezza_cm)), labels = c("Q1", "Q2", "Q3", "Q4"),
+    include.lowest = TRUE)
+
+```
+
+Q1) molto bassi: (175.3, 193.0]
+
+Q2) bassi: (193.0, 198.1]
+
+Q3) alti: (198.1, 203.2]
+
+Q4) molto alti: (203.2, 223.5)
+
+
+## BUBBLEPLOT REB/MIN (cor.p: 0.45)
+
+```{r REB/MIN bubble, message=FALSE, warning=FALSE, fig.align = 'center'}
+  inf_agg <- paste0(dataframe$Player, "\nPos: ", dataframe$Pos, "\nAlt: ", dataframe$Altezza_cm, "\nORB: ", dataframe$ORB, "\nDRB: ", dataframe$DRB, "\nREB: ", dataframe$REB, "\nMIN: ", dataframe$MIN)
+
+# bubbleplot
+bubbleplot <- ggplot(dataframe_pulito, aes(x = jitter(Altezza_cm, factor = 3), y = REB_MIN, size = MIN/1000, color = Pos)) +
+    geom_point(alpha = 0.7, aes(text = inf_agg)) +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    theme_ipsum() +
+    stat_smooth(method = "lm", se=FALSE, color="red") +
+    xlab("Altezza(cm)") +
+    ylab("REB/MIN") +
+    theme(legend.position="none")
+# bubbleplot interattivo
+ggplotly(bubbleplot, tooltip="text") 
+
+
+```
+
+## POSIZIONE (%)
+
+```{r Posizioneperc, message=FALSE, warning=FALSE, fig.align = 'center'}
+
+# tabella riassuntiva
+tabella_freq <- table(dataframe$Pos, dataframe$Altezza_cm)
+tabella_riassuntiva <- addmargins(tabella_freq)
+
+# Stampa la tabella riassuntiva
+# print(tabella_riassuntiva)
+
+tabella_perc <- apply(tabella_freq, 2, function(x){x*100/sum(x,na.rm=T)})
+
+# rownames(data) <- c("var1","var2","var3")
+
+etichette_posizioni <- c("Point Guard(PG)", "Shooting Guard(SG)", "Forward(F)", "Small Forward(SF)", "Power Forward-Center(FC)", "Center(C)", "Point Guard(G)", "Power Foward(PF)", "Shooting Guard-Power Forward(GF)")
+
+par(mar=c(5.1,4.1,4.1,15.4), xpd = TRUE)
+
+# Crea lo stacked barplot con le percentuali
+barplot(tabella_perc, 
+        beside = FALSE, 
+        xlab = "Altezza(cm)", 
+        main = "Stacked Barplot",
+        col = viridis(9))
+
+legend("right", inset=c(-0.87, 0),
+       legend = etichette_posizioni,    
+       fill = viridis(9),               
+       title = "Posizioni")
+```
+
+## BOXPLOT REB/MIN (cor.p: 0.45)
+
+```{r REB/MIN boxplot, message=FALSE, warning=FALSE, fig.align = 'center'}
+# tipi delle tre colonne
+# dataframe$ORB int
+# dataframe$DRB int
+# dataframe$REB int
+
+# Set plot layout
+
+# plot
+ggplot(dataframe_pulito, aes(x = Quartili, y = REB_MIN) ) +
+    geom_boxplot(fill="lightblue") +
+    theme_ipsum() +
+    xlab("Quartili delle altezze") +
+    ylab("REB / MIN")
+
+
+
+```
+
+## BUBBLEPLOT ORB/MIN (cor.p: 0.39)
+
+```{r ORB/MIN bubble, message=FALSE, warning=FALSE, fig.align = 'center'}
+# tipi delle tre colonne
+# dataframe$ORB int
+# dataframe$DRB int
+# dataframe$REB int
+
+inf_agg <- paste0(dataframe$Player, "\nPos: ", dataframe$Pos, "\nAlt: ", dataframe$Altezza_cm, "\nORB: ", dataframe$ORB, "\nDRB: ", dataframe$DRB, "\nREB: ", dataframe$REB, "\nMIN: ", dataframe$MIN)
+
+# bubbleplot
+bubbleplot <- ggplot(dataframe_pulito, aes(x = jitter(Altezza_cm, factor = 3), y = ORB_MIN, size = MIN/1000, color = Pos)) +
+    geom_point(alpha = 0.7, aes(text = inf_agg)) +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    theme_ipsum() +
+    stat_smooth(method = "lm", se=FALSE, color="red") +
+    xlab("Altezza(cm)") +
+    ylab("ORB/MIN") +
+    theme(legend.position="none")
+# bubbleplot interattivo
+ggplotly(bubbleplot, tooltip="text") 
+```
+
+## BOXPLOT ORB/MIN (cor.p: 0.39)
+
+```{r ORB/MIN boxplot, message=FALSE, warning=FALSE, fig.align = 'center'}
+
+  # plot
+  ggplot(dataframe_pulito, aes(x = Quartili, y = ORB_MIN) ) +
+    geom_boxplot(fill="lightblue") +
+    theme_ipsum() +
+    xlab("Quartili delle altezze") +
+    ylab("ORB / MIN")
+
+
+```
+
+## BUBBLEPLOT DRB/MIN (cor.p: 0.39)
+
+```{r DRB/MIN bubble, message=FALSE, warning=FALSE, fig.align = 'center'}
+#warning false perchè log10(0)=NA
+
+# tipi delle tre colonne
+# dataframe$ORB int
+# dataframe$DRB int
+# dataframe$REB int
+
+inf_agg <- paste0(dataframe$Player, "\nPos: ", dataframe$Pos, "\nAlt: ", dataframe$Altezza_cm, "\nORB: ", dataframe$ORB, "\nDRB: ", dataframe$DRB, "\nREB: ", dataframe$REB, "\nMIN: ", dataframe$MIN)
+
+# bubbleplot
+bubbleplot <- ggplot(dataframe_pulito, aes(x = jitter(Altezza_cm, factor = 3), y = DRB_MIN, size = MIN/1000, color = Pos)) +
+    geom_point(alpha = 0.7, aes(text = inf_agg)) +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    theme_ipsum() +
+    stat_smooth(method = "lm", se=FALSE, color="red") +
+    xlab("Altezza(cm)") +
+    ylab("DRB/MIN") +
+    theme(legend.position="none")
+# bubbleplot interattivo
+ggplotly(bubbleplot, tooltip="text") 
+```
+
+## BOXPLOT DRB/MIN (cor.p: 0.39)
+
+```{r DRB/MIN boxplot, message=FALSE, warning=FALSE, fig.align = 'center'}
+  # plot
+  ggplot(dataframe_pulito, aes(x = Quartili, y = DRB_MIN) ) +
+    geom_boxplot(fill="lightblue") +
+    theme_ipsum() +
+    xlab("Quartili delle altezze") +
+    ylab("DRB / MIN")
+
+
+```
+
+
+## BUBBLEPLOT FGP (cor.p: 0.3)
+
+```{r FGP bubble, message=FALSE, warning=FALSE, fig.align = 'center'}
+inf_agg <- paste0(dataframe$Player, "\nPos: ", dataframe$Pos, "\nAlt: ", dataframe$Altezza_cm, "\nFGM: ", dataframe$FGM, "\nFGA: ", dataframe$FGA, "\nFGP: ", round(dataframe$FGP, digits = 4)*100, "%")
+
+# bubbleplot
+bubbleplot <- ggplot(dataframe_pulito, aes(x = jitter(Altezza_cm, factor = 3), y = FGP, size = FGM/250, color = Pos)) +
+    geom_point(alpha = 0.7, aes(text = inf_agg)) +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    theme_ipsum() +
+    stat_smooth(method = "lm", se=FALSE, color="red") +
+    xlab("Altezza(cm)") +
+    ylab("FGP") +
+    theme(legend.position="none")
+# bubbleplot interattivo
+ggplotly(bubbleplot, tooltip="text") 
+```
+
+## BOXPLOT FGP (cor.p: 0.3)
+
+```{r FGP boxplot, message=FALSE, warning=FALSE, fig.align = 'center'}
+  # plot
+  ggplot(dataframe_pulito, aes(x = Quartili, y = FGP) ) +
+    geom_boxplot(fill="lightblue") +
+    theme_ipsum() +
+    xlab("Quartili delle altezze") +
+    ylab("FGP")
+
+
+```
+
+## BUBBLEPLOT BLK/MIN (cor.p: 0.26)
+
+```{r BLK/MIN bubble, message=FALSE, warning=FALSE, fig.align = 'center'}
+
+dataframe_blk <- subset(dataframe, dataframe$MIN>3)
+dataframe_blk$Quartili <- subset(dataframe_pulito$Quartili, dataframe_pulito$MIN>3)
+
+inf_agg <- paste0(dataframe_blk$Player, "\nPos: ", dataframe_blk$Pos, "\nAlt: ", dataframe_blk$Altezza_cm, "\nBLK: ", dataframe_blk$BLK, "\nMIN: ", dataframe_blk$MIN)
+
+# bubbleplot
+bubbleplot <- ggplot(dataframe_blk, aes(x = jitter(Altezza_cm, factor = 3), y = BLK_MIN, size = MIN/1000, color = Pos)) +
+    geom_point(alpha = 0.7, aes(text = inf_agg)) +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    theme_ipsum() +
+    stat_smooth(method = "lm", se=FALSE, color="red") +
+    xlab("Altezza(cm)") +
+    ylab("BLK/MIN") +
+    theme(legend.position="none")
+# bubbleplot interattivo
+ggplotly(bubbleplot, tooltip="text") 
+```
+
+## BOXPLOT BLK/MIN (cor.p: 0.26)
+
+```{r BLK/MIN boxplot, message=FALSE, warning=FALSE, fig.align = 'center'}
+  # plot
+  ggplot(dataframe_blk, aes(x = Quartili, y = BLK_MIN) ) +
+    geom_boxplot(fill="lightblue") +
+    theme_ipsum() +
+    xlab("Quartili delle altezze") +
+    ylab("BLK/MIN")
+
+
+```
+
+## BUBBLEPLOT PF/MIN (cor.p: 0.23)
+
+```{r PF/MIN bubble, message=FALSE, warning=FALSE, fig.align = 'center'}
+
+dataframe_pf <- subset(dataframe_pulito, dataframe_pulito$MIN>3)
+
+inf_agg <- paste0(dataframe_pf$Player, "\nPos: ", dataframe_pf$Pos, "\nAlt: ", dataframe_pf$Altezza_cm, "\nPF: ", dataframe_pf$PF, "\nMIN: ", dataframe_pf$MIN)
+
+# bubbleplot
+bubbleplot <- ggplot(dataframe_pf, aes(x = jitter(Altezza_cm, factor = 3), y = PF_MIN, size = MIN/1000, color = Pos)) +
+    geom_point(alpha = 0.7, aes(text = inf_agg)) +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    theme_ipsum() +
+    stat_smooth(method = "lm", se=FALSE, color="red") +
+    xlab("Altezza(cm)") +
+    ylab("PF/MIN") +
+    theme(legend.position="none")
+# bubbleplot interattivo
+ggplotly(bubbleplot, tooltip="text") 
+```
+
+## BOXPLOT PF/MIN (cor.p: 0.23)
+
+```{r PF/MIN boxplot, message=FALSE, warning=FALSE, fig.align = 'center'}
+  # plot
+  ggplot(dataframe_pf, aes(x = Quartili, y = PF_MIN) ) +
+    geom_boxplot(fill="lightblue") +
+    theme_ipsum() +
+    xlab("Quartili delle altezze") +
+    ylab("PF/MIN")
+
+
+```
+
+## BUBBLEPLOT STL/MIN  (cor.p:-0.11)
+
+```{r STL/MIN bubble, message=FALSE, warning=FALSE, fig.align = 'center'}
+
+dataframe_stl <- subset(dataframe_pulito, dataframe_pulito$MIN>6.2)
+
+inf_agg <- paste0(dataframe_stl$Player, "\nPos: ", dataframe_stl$Pos, "\nAlt: ", dataframe_stl$Altezza_cm, "\nSTL: ", dataframe_stl$STL, "\nMIN: ", dataframe_stl$MIN)
+
+# bubbleplot
+bubbleplot <- ggplot(dataframe_stl, aes(x = jitter(Altezza_cm, factor = 3), y = STL_MIN, size = MIN/1000, color = Pos)) +
+    geom_point(alpha = 0.7, aes(text = inf_agg)) +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    theme_ipsum() +
+    stat_smooth(method = "lm", se=FALSE, color="red") +
+    xlab("Altezza(cm)") +
+    ylab("STL/MIN") +
+    theme(legend.position="none")
+# bubbleplot interattivo
+ggplotly(bubbleplot, tooltip="text") 
+```
+
+## BOXPLOT STL/MIN  (cor.p:-0.11)
+
+```{r STL/MIN boxplot, message=FALSE, warning=FALSE, fig.align = 'center'}
+  # plot
+  ggplot(dataframe_stl, aes(x = Quartili, y = STL_MIN) ) +
+    geom_boxplot(fill="lightblue") +
+    theme_ipsum() +
+    xlab("Quartili delle altezze") +
+    ylab("STL/MIN")
+
+
+```
+
+## BUBBLEPLOT TPM (cor.p: -0.146) - TPA (cor.p: -0.147) - TPP (cor.p: -0.09)
+
+```{r  bubble, message=FALSE, warning=FALSE, fig.align = 'center'}
+
+dataframe_tpp <- subset(dataframe_pulito, dataframe_pulito$TPA>=5)
+dataframe_tpp$Quartili <- subset(dataframe_pulito$Quartili, dataframe_pulito$TPA>=5)
+
+inf_agg <- paste0(dataframe_tpp$Player, "\nPos: ", dataframe_tpp$Pos, "\nAlt: ", dataframe_tpp$Altezza_cm, "\nTPM: ", dataframe_tpp$TPM, "\nTPA: ", dataframe_tpp$TPA, "\nTPP: ", round(dataframe_tpp$TPP, digits = 2)*100, "%")
+
+# bubbleplot
+bubbleplot <- ggplot(dataframe_tpp, aes(x = jitter(Altezza_cm, factor = 3), y = TPP, size = TPA, color = Pos)) +
+    geom_point(alpha = 0.7, aes(text = inf_agg)) +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    theme_ipsum() +
+    stat_smooth(method = "lm", se=FALSE, color="red") +
+    xlab("Altezza(cm)") +
+    ylab("TPP") +
+    theme(legend.position="none")
+# bubbleplot interattivo
+ggplotly(bubbleplot, tooltip="text")
+```
+
+## BOXPLOT TPM (cor.p: -0.146) - TPA (cor.p: -0.147) - TPP (cor.p: -0.09)
+
+
+```{r TPP/MIN boxplot, message=FALSE, warning=FALSE, fig.align = 'center'}
+  # plot
+  ggplot(dataframe_tpp, aes(x = Quartili, y = TPP) ) +
+    geom_boxplot(fill="lightblue") +
+    theme_ipsum() +
+    xlab("Quartili delle altezze") +
+    ylab("TPP")
+
+
+```
+
+
+## BUBBLEPLOT AST_MIN (cor.p: -0.35)
+
+```{r AST/MIN bubble, message=FALSE, warning=FALSE, fig.align = 'center'}
+
+dataframe_ast <- subset(dataframe_pulito, dataframe_pulito$MIN>=0)
+dataframe_ast$Quartili <- subset(dataframe_pulito$Quartili, dataframe_pulito$MIN>=0)
+
+inf_agg <- paste0(dataframe_ast$Player, "\nPos: ", dataframe_ast$Pos, "\nAlt: ", dataframe_ast$Altezza_cm, "\nAST: ", dataframe_ast$AST, "\nMIN: ", dataframe_ast$MIN)
+
+# bubbleplot
+bubbleplot <- ggplot(dataframe_ast, aes(x = jitter(Altezza_cm, factor = 3), y = AST_MIN, size = MIN/1000, color = Pos)) +
+    geom_point(alpha = 0.7, aes(text = inf_agg)) +
+    scale_color_viridis(discrete=TRUE, guide="none") +
+    theme_ipsum() +
+    stat_smooth(method = "lm", se=FALSE, color="red") +
+    xlab("Altezza(cm)") +
+    ylab("AST/MIN") +
+    theme(legend.position="none")
+# bubbleplot interattivo
+ggplotly(bubbleplot, tooltip="text") 
+```
+
+## BOXPLOT AST_MIN (cor.p: -0.35)
+
+
+```{r AST/MIN boxplot, message=FALSE, warning=FALSE, fig.align = 'center'}
+  # plot
+  ggplot(dataframe_stl, aes(x = Quartili, y = AST_MIN) ) +
+    geom_boxplot(fill="lightblue") +
+    theme_ipsum() +
+    xlab("Quartili delle altezze") +
+    ylab("AST/MIN")
+
+
+```
+
+## RIEPILOGO (CONTRIBUTI)
+
+Le più evidenti correlazioni positive: 
+
+* REB/MIN (cor.p: 0.45), ORB/MIN(cor.p: 0.39), DRB/MIN(cor.p: 0.39)
+* FGP (0.30)
+* BLK/MIN (cor.p: 0.26)
+* PF/MIN (cor.p: 0.23)
+
+Le più evidenti correlazioni negative: 
+
+* STL/MIN (cor.p: 11.7)
+* TPM (cor.p: -0.15), TPA(cor.p: -0.15), TPP(cor.p: -0.10)
+* AST/MIN (cor.p: -0.35)
