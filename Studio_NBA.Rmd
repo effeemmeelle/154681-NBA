@@ -49,9 +49,11 @@ library(dplyr)
 library(plotly)
 ```
 
-## INTRODUZIONE / Studio sulla performance dei giocatori di NBA
+## INTRODUZIONE
 
-Come e quanto l'altezza di un giocatore di basket influenza:
+Studio sulla performance dei giocatori di NBA:
+
+Come e quanto l'altezza di un giocatore di basket influenza
 
 1. il ruolo giocato
 
@@ -77,7 +79,7 @@ Raccolte pubbliche di dati dei giocatori NBA: [https://basketball.realgm.com/nba
 statistiche.txt (539 righe/giocatori, 22 colonne/Variabili)
 
 * mi concentro su:
-  * Team, GP(Games Played), MIN (Minutes played), PTS(Total points), 
+  * Team, POS(Position), GP(Games Played), MIN (Minutes played), PTS(Total points), 
   * FGM, FGA, FGP (Field goals: made, attempted, %), 
   * TPM, TPA, TPP (Three-pointers: made, attempted, %), 
   * FTM, FTA, FTP (Free throws: made, attempted, %), 
@@ -174,7 +176,7 @@ for (col in stat_col) {
 correlazione_df <- correlazione_df[order(correlazione_df$correlazione, decreasing = TRUE), ]
 
 
-barplot(correlazione_df$correlazione, ylab = "CORRELAZIONE (PEARSON)", main = "GRAFICO A BARRE DELLE CORRELAZIONI (PEARSON)\n TRA VARIABILI DI INTERESSE E ALTEZZA", names.arg = correlazione_df$statistica, las=2, col = ifelse(abs(correlazione_df$correlazione) > 0.09,"blue","lightblue"), space = 1, width = 30)
+barplot(correlazione_df$correlazione, ylab = "CORRELAZIONE (PEARSON)", main = "CORRELAZIONI (PEARSON)\n TRA VARIABILI DI INTERESSE E ALTEZZA", names.arg = correlazione_df$statistica, las=2, col = ifelse(abs(correlazione_df$correlazione) > 0.09,"blue","lightblue"), space = 1, width = 30)
 
 #for(i in 1:nrow(correlazione_df)) {
 #  if(abs(correlazione_df$correlazione[i]) >= 0.10) {cat(paste0(correlazione_df$statistica[i], "(", round(correlazione_df$correlazione[i], digits = 2), ") "))}
@@ -203,7 +205,7 @@ for(i in 1:nrow(correlazione_df)) {
     stat <- correlazione_df$statistica[i]
     abscor <- abs(correlazione_df$correlazione[i])
     if(abscor > 0.09)
-      cat(paste0("<tr><td>", stat, "</td><td>", round(correlazione_df$correlazione[i], digits=3), "</td><td>", cor.test(dataframe[[stat]], dataframe$Altezza_cm)$p.value, "</td></tr>"))
+      cat(paste0("<tr><td>", stat, "</td><td>", round(correlazione_df$correlazione[i], digits=3), "</td><td>", signif(cor.test(dataframe[[stat]], dataframe$Altezza_cm)$p.value, digits = 3), "</td></tr>"))
 }
  
   
@@ -228,7 +230,7 @@ for (col in stat_col) {
 correlazione_df <- correlazione_df[order(correlazione_df$correlazione, decreasing = TRUE), ]
 
 
-barplot(correlazione_df$correlazione, ylab = "CORRELAZIONE (KENDALL)", main = "GRAFICO A BARRE DELLE CORRELAZIONI (KENDALL)\n TRA VARIABILI DI INTERESSE E ALTEZZA", names.arg = correlazione_df$statistica, las=2, col = ifelse(abs(correlazione_df$correlazione) > 0.10,"blue","lightblue"), space = 1, width = 30)
+barplot(correlazione_df$correlazione, ylab = "CORRELAZIONE (KENDALL)", main = "CORRELAZIONI (KENDALL)\n TRA VARIABILI DI INTERESSE E ALTEZZA", names.arg = correlazione_df$statistica, las=2, col = ifelse(abs(correlazione_df$correlazione) > 0.10,"blue","lightblue"), space = 1, width = 30)
 
 #for(i in 1:nrow(correlazione_df)) {
 #  if(abs(correlazione_df$correlazione[i]) >= 0.10) {cat(paste0(correlazione_df$statistica[i], "(", round(correlazione_df$correlazione[i], digits = 2), ") "))}
@@ -258,37 +260,13 @@ for(i in 1:nrow(correlazione_df)) {
     stat <- correlazione_df$statistica[i]
     abscor <- abs(correlazione_df$correlazione[i])
     if(abscor > 0.10)
-      cat(paste0("<tr><td>", stat, "</td><td>", round(correlazione_df$correlazione[i], digits=3), "</td><td>", cor.test(dataframe[[stat]], dataframe$Altezza_cm, method="kendall")$p.value, "</td></tr>"))
+      cat(paste0("<tr><td>", stat, "</td><td>", round(correlazione_df$correlazione[i], digits=3), "</td><td>", signif(cor.test(dataframe[[stat]], dataframe$Altezza_cm, method="kendall")$p.value, digits=3), "</td></tr>"))
 }
  
   
   #print(paste0("Statistica: ", stat, " Valore p: ", round(p_value_altezza, digits=4), "Coeff: ", round(coeff_altezza, digits=4)))
 ```
 </table>
-
-## SUDDIVISIONE IN QUARTILI
-
-```{r quartili}
-# summary(dataframe$Altezza_cm)
-
-# min 175.3
-quartile1 <- summary(dataframe$Altezza_cm)[[2]] # 191.35
-quartile2 <- summary(dataframe$Altezza_cm)[[3]] #mediana 198.1
-quartile3 <- summary(dataframe$Altezza_cm)[[5]] # 203.2
-# max 223.5
-
-dataframe_pulito$Quartili <- cut(dataframe_pulito$Altezza_cm, breaks = c(min(dataframe_pulito$Altezza_cm), quartile1, quartile2, quartile3, max(dataframe_pulito$Altezza_cm)), labels = c("Q1", "Q2", "Q3", "Q4"),
-    include.lowest = TRUE)
-
-```
-
-Q1) molto bassi: (175.3, 193.0]
-
-Q2) bassi: (193.0, 198.1]
-
-Q3) alti: (198.1, 203.2]
-
-Q4) molto alti: (203.2, 223.5)
 
 
 ## BUBBLEPLOT REB/MIN (cor.p: 0.45)
@@ -303,7 +281,7 @@ bubbleplot <- ggplot(dataframe_pulito, aes(x = jitter(Altezza_cm, factor = 3), y
     theme_ipsum() +
     stat_smooth(method = "lm", se=FALSE, color="red") +
     xlab("Altezza(cm)") +
-    ylab("REB/MIN") +
+    ylab("No. rimbalzi per minuto giocato") +
     theme(legend.position="none")
 # bubbleplot interattivo
 ggplotly(bubbleplot, tooltip="text") 
@@ -343,6 +321,33 @@ legend("right", inset=c(-0.87, 0),
        title = "Posizioni")
 ```
 
+## SUDDIVISIONE IN QUARTILI
+
+```{r quartili}
+# summary(dataframe$Altezza_cm)
+
+# min 175.3
+quartile1 <- summary(dataframe$Altezza_cm)[[2]] # 191.35
+quartile2 <- summary(dataframe$Altezza_cm)[[3]] #mediana 198.1
+quartile3 <- summary(dataframe$Altezza_cm)[[5]] # 203.2
+# max 223.5
+
+dataframe_pulito$Quartili <- cut(dataframe_pulito$Altezza_cm, breaks = c(min(dataframe_pulito$Altezza_cm), quartile1, quartile2, quartile3, max(dataframe_pulito$Altezza_cm)), labels = c("Q1", "Q2", "Q3", "Q4"),
+    include.lowest = TRUE)
+
+```
+
+Per visualizzare la distribuzione delle performance, divido i giocatori per altezza in quattro gruppi
+
+Q1) molto bassi: (175.3cm, 193.0cm]
+
+Q2) bassi: (193.0cm, 198.1cm]
+
+Q3) alti: (198.1cm, 203.2cm]
+
+Q4) molto alti: (203.2cm, 223.5cm)
+
+
 ## BOXPLOT REB/MIN (cor.p: 0.45)
 
 ```{r REB/MIN boxplot, message=FALSE, warning=FALSE, fig.align = 'center'}
@@ -358,7 +363,7 @@ ggplot(dataframe_pulito, aes(x = Quartili, y = REB_MIN) ) +
     geom_boxplot(fill="lightblue") +
     theme_ipsum() +
     xlab("Quartili delle altezze") +
-    ylab("REB / MIN")
+    ylab("No. rimbalzi per minuto giocato")
 
 
 
@@ -381,7 +386,7 @@ bubbleplot <- ggplot(dataframe_pulito, aes(x = jitter(Altezza_cm, factor = 3), y
     theme_ipsum() +
     stat_smooth(method = "lm", se=FALSE, color="red") +
     xlab("Altezza(cm)") +
-    ylab("ORB/MIN") +
+    ylab("No. rimbalzi offensivi al minuto") +
     theme(legend.position="none")
 # bubbleplot interattivo
 ggplotly(bubbleplot, tooltip="text") 
@@ -396,7 +401,7 @@ ggplotly(bubbleplot, tooltip="text")
     geom_boxplot(fill="lightblue") +
     theme_ipsum() +
     xlab("Quartili delle altezze") +
-    ylab("ORB / MIN")
+    ylab("No. rimbalzi offensivi per minuto giocato")
 
 
 ```
@@ -420,7 +425,7 @@ bubbleplot <- ggplot(dataframe_pulito, aes(x = jitter(Altezza_cm, factor = 3), y
     theme_ipsum() +
     stat_smooth(method = "lm", se=FALSE, color="red") +
     xlab("Altezza(cm)") +
-    ylab("DRB/MIN") +
+    ylab("No. rimbalzi difensivi per minuto giocato") +
     theme(legend.position="none")
 # bubbleplot interattivo
 ggplotly(bubbleplot, tooltip="text") 
@@ -434,7 +439,7 @@ ggplotly(bubbleplot, tooltip="text")
     geom_boxplot(fill="lightblue") +
     theme_ipsum() +
     xlab("Quartili delle altezze") +
-    ylab("DRB / MIN")
+    ylab("No. rimbalzi difensivi per minuto giocato")
 
 
 ```
@@ -452,7 +457,7 @@ bubbleplot <- ggplot(dataframe_pulito, aes(x = jitter(Altezza_cm, factor = 3), y
     theme_ipsum() +
     stat_smooth(method = "lm", se=FALSE, color="red") +
     xlab("Altezza(cm)") +
-    ylab("FGP") +
+    ylab("Percentuale dei tiri da campo realizzati") +
     theme(legend.position="none")
 # bubbleplot interattivo
 ggplotly(bubbleplot, tooltip="text") 
@@ -466,7 +471,7 @@ ggplotly(bubbleplot, tooltip="text")
     geom_boxplot(fill="lightblue") +
     theme_ipsum() +
     xlab("Quartili delle altezze") +
-    ylab("FGP")
+    ylab("Percentuale dei tiri da campo realizzati")
 
 
 ```
@@ -487,7 +492,7 @@ bubbleplot <- ggplot(dataframe_blk, aes(x = jitter(Altezza_cm, factor = 3), y = 
     theme_ipsum() +
     stat_smooth(method = "lm", se=FALSE, color="red") +
     xlab("Altezza(cm)") +
-    ylab("BLK/MIN") +
+    ylab("No. di stoppate per minuto giocato") +
     theme(legend.position="none")
 # bubbleplot interattivo
 ggplotly(bubbleplot, tooltip="text") 
@@ -500,7 +505,7 @@ ggplotly(bubbleplot, tooltip="text")
   ggplot(dataframe_blk, aes(x = Quartili, y = BLK_MIN) ) +
     geom_boxplot(fill="lightblue") +
     theme_ipsum() +
-    xlab("Quartili delle altezze") +
+    xlab("No. di stoppate per minuto giocato") +
     ylab("BLK/MIN")
 
 
@@ -521,7 +526,7 @@ bubbleplot <- ggplot(dataframe_pf, aes(x = jitter(Altezza_cm, factor = 3), y = P
     theme_ipsum() +
     stat_smooth(method = "lm", se=FALSE, color="red") +
     xlab("Altezza(cm)") +
-    ylab("PF/MIN") +
+    ylab("No. di falli per minuto giocato") +
     theme(legend.position="none")
 # bubbleplot interattivo
 ggplotly(bubbleplot, tooltip="text") 
@@ -535,7 +540,7 @@ ggplotly(bubbleplot, tooltip="text")
     geom_boxplot(fill="lightblue") +
     theme_ipsum() +
     xlab("Quartili delle altezze") +
-    ylab("PF/MIN")
+    ylab("No. di falli per minuto giocato")
 
 
 ```
@@ -555,7 +560,7 @@ bubbleplot <- ggplot(dataframe_stl, aes(x = jitter(Altezza_cm, factor = 3), y = 
     theme_ipsum() +
     stat_smooth(method = "lm", se=FALSE, color="red") +
     xlab("Altezza(cm)") +
-    ylab("STL/MIN") +
+    ylab("No. di palle rubate per minuto giocato") +
     theme(legend.position="none")
 # bubbleplot interattivo
 ggplotly(bubbleplot, tooltip="text") 
@@ -568,7 +573,7 @@ ggplotly(bubbleplot, tooltip="text")
   ggplot(dataframe_stl, aes(x = Quartili, y = STL_MIN) ) +
     geom_boxplot(fill="lightblue") +
     theme_ipsum() +
-    xlab("Quartili delle altezze") +
+    xlab("No. di palle rubate per minuto giocato") +
     ylab("STL/MIN")
 
 
@@ -590,7 +595,7 @@ bubbleplot <- ggplot(dataframe_tpp, aes(x = jitter(Altezza_cm, factor = 3), y = 
     theme_ipsum() +
     stat_smooth(method = "lm", se=FALSE, color="red") +
     xlab("Altezza(cm)") +
-    ylab("TPP") +
+    ylab("Percentuale di tiri da tre realizzati") +
     theme(legend.position="none")
 # bubbleplot interattivo
 ggplotly(bubbleplot, tooltip="text")
@@ -605,7 +610,7 @@ ggplotly(bubbleplot, tooltip="text")
     geom_boxplot(fill="lightblue") +
     theme_ipsum() +
     xlab("Quartili delle altezze") +
-    ylab("TPP")
+    ylab("Percentuale di tiri da tre realizzati")
 
 
 ```
@@ -627,7 +632,7 @@ bubbleplot <- ggplot(dataframe_ast, aes(x = jitter(Altezza_cm, factor = 3), y = 
     theme_ipsum() +
     stat_smooth(method = "lm", se=FALSE, color="red") +
     xlab("Altezza(cm)") +
-    ylab("AST/MIN") +
+    ylab("No. di assist per minuto giocato") +
     theme(legend.position="none")
 # bubbleplot interattivo
 ggplotly(bubbleplot, tooltip="text") 
@@ -642,22 +647,34 @@ ggplotly(bubbleplot, tooltip="text")
     geom_boxplot(fill="lightblue") +
     theme_ipsum() +
     xlab("Quartili delle altezze") +
-    ylab("AST/MIN")
+    ylab("No. di assist per minuto giocato")
 
 
 ```
 
-## RIEPILOGO (CONTRIBUTI)
+## RIEPILOGO 
 
 Le più evidenti correlazioni positive: 
 
-* REB/MIN (cor.p: 0.45), ORB/MIN(cor.p: 0.39), DRB/MIN(cor.p: 0.39)
-* FGP (0.30)
-* BLK/MIN (cor.p: 0.26)
-* PF/MIN (cor.p: 0.23)
+* REB/MIN (cor.p: 0.449), ORB/MIN(cor.p: 0.393), DRB/MIN(cor.p: 0.389)
+* FGP (0.295)
+* BLK/MIN (cor.p: 0.261)
+* PF/MIN (cor.p: 0.230)
 
 Le più evidenti correlazioni negative: 
 
-* STL/MIN (cor.p: 11.7)
-* TPM (cor.p: -0.15), TPA(cor.p: -0.15), TPP(cor.p: -0.10)
-* AST/MIN (cor.p: -0.35)
+* STL/MIN (cor.p: 0.114)
+* TPM (cor.p: -0.147), TPA(cor.p: -0.146), TPP(cor.p: -0.092)
+* AST/MIN (cor.p: -0.349)
+
+## CONCLUSIONI (CONTRIBUTI)
+
+Abbiamo visualizzato come la distribuzione dei ruoli dei giocatori è correlata alla loro altezza con un grafico a barre (impilate).
+
+Inoltre, il mio studio dimostra una correlazione tra l'altezza dei giocatori con alcune delle le loro prestazioni. In particolare:
+
+* i giocatori alti eccellono in rimbalzi (totali, offensivi e difensivi) al minuto, percentuale dei tiri da campo, stoppate /min e falli / min
+
+* i giocatori bassi eccellono in assist al minuto, nei tiri da tre, e nel numero di palle rubate al minuto.
+
+
